@@ -1,0 +1,19 @@
+{
+  "name": "jsfirmador",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",  
+  "scripts": {
+    "start": "node index.js",  
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "jose": "^5.9.6",
+    "jsonld": "^8.3.3"
+  }
+}

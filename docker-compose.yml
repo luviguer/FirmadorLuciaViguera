@@ -1,0 +1,27 @@
+services:
+  firmador:
+    container_name: firmador
+    build: firmador
+    ports:
+      - "8080:8080"
+    environment:
+      - CONTEXT_1=https://www.w3.org/ns/credentials/v2
+      - CONTEXT_2=https://w3id.org/gaia-x/development#
+      - TYPE=VerifiableCredential 
+      - TYPE_LegalPerson=gx:LegalPerson
+      - ISSUER=did:web:arlabdevelopments.com
+      - API_PROTOCOL=http
+      - API_HOST=lucia.arlabdevelopments.com
+      - API_PORT=2002
+      - API_URI=jws
+
+    volumes:
+      - ./keystore.p12:/app/keystore.p12:ro
+      
+  api:
+    container_name: api
+    build: JSFirmador
+    ports:
+      - "2002:2002"
+
+

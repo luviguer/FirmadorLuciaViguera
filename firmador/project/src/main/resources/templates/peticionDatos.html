@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduce datos</title>
+    <link rel="stylesheet" href="./style_peticionDatos.css">
+
+
+    <script>
+
+        function visibilidadContrasena() {
+            var contrasena = document.getElementById("contrasena");
+            if (contrasena.type === "password") {
+                contrasena.type = "text";
+            } else {
+                contrasena.type = "password";
+            }
+        }
+
+    </script>
+</head>
+<body>
+    
+        <div class="container">
+            <form action="#" th:action="@{/upload}" method="POST" enctype="multipart/form-data" onsubmit="saveHiddenFieldsToLocalStorage()">
+                <h2>Import signed documents</h2>
+
+                <div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
+                <div class="form-group">
+                    <label for="archivo">Archivo:</label>
+                    <input type="file" name="archivo" id="archivo" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="seleccion">Alias:</label>
+                    <select name="seleccion" id="seleccion" required>
+                        <option value="1">1</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña:</label>
+                    <input type="password" name="contrasena" id="contrasena" required />
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" name="check" id="check" onclick="visibilidadContrasena()" />
+                    <label for="check"> Mostrar contraseña</label>
+                </div>
+
+                <input type="hidden" id="json" name="json" th:value="${jsonResponse}" />
+                <input type="hidden" id="lrn" name="lrn" th:value="${lrn}" />
+                <input type="hidden" id="tYc" name="tYc" th:value="${tYc}" />
+                <input type="hidden" id="verifiableIdTerminos" name="verifiableIdTerminos" th:value="${verifiableIdTerminos}" />
+                <input type="hidden" id="verifiableIdParticipant" name="verifiableIdParticipant" th:value="${verifiableIdParticipant}" />
+
+                <button type="submit">Crear JWS</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
