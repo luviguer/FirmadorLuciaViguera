@@ -112,6 +112,42 @@ public class FuncionesAuxiliares {
 }
 
 
+public String generarJsonLDTerminosCondiciones(String verifiableId) throws JsonProcessingException {
+    logger.info("Iniciando generación de JSON-LD para Términos y Condiciones...");
+
+    // Obtener la fecha actual en formato ISO 8601
+    String validFrom = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(new Date());
+
+    // Construcción del JSON-LD
+    Map<String, Object> jsonLd = new LinkedHashMap<>();
+    jsonLd.put("@context", Arrays.asList(
+        "https://www.w3.org/ns/credentials/v2",
+        "https://w3id.org/gaia-x/development#"
+    ));
+    jsonLd.put("type", Arrays.asList("VerifiableCredential", "gx:Issuer"));
+    jsonLd.put("id", verifiableId);
+    jsonLd.put("validFrom", validFrom);
+    jsonLd.put("issuer", System.getenv("ISSUER"));
+
+    // Construcción del credentialSubject
+    Map<String, Object> credentialSubject = new LinkedHashMap<>();
+    credentialSubject.put("id", verifiableId);
+    credentialSubject.put("gx:gaiaxTermsAndConditions", System.getenv("TERMS"));
+
+    jsonLd.put("credentialSubject", credentialSubject);
+
+    // Convertir el mapa a un String JSON usando ObjectMapper
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jsonResult = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonLd);
+
+    logger.info("JSON-LD de Términos y Condiciones generado exitosamente:");
+    logger.info("\n" + jsonResult);
+
+    return jsonResult;
+}
+
+
+
 
 
 
@@ -174,6 +210,10 @@ public class FuncionesAuxiliares {
             throw new RuntimeException(e);
         }
     }
+
+
+
+    
     
 
 

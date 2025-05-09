@@ -11,8 +11,16 @@
     <div class="container">    
         <h1>FIRMADOR</h1> 
         <form th:action="@{/startLegalPerson}" method="GET" enctype="multipart/form-data"> 
-            <button type="submit" class="legalPerson-button">LegalPerson</button>
-        </form>      
+            <button type="submit" class="general-button">LegalPerson</button>
+        </form>     
+        
+        <form th:action="@{/startTerminosCondiciones}" method="GET" enctype="multipart/form-data"> 
+            <button type="submit" class="general-button">Terminos y Condiciones</button>
+        </form>
+
+        <form th:action="@{/startRequisitos}" method="GET" enctype="multipart/form-data"> 
+            <button type="submit" class="general-button">Presentacion Verificable</button>
+        </form>
     </div>
 </body>
 </html>

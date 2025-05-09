@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Términos y Condiciones</title>
+    <link rel="stylesheet" href="./style_terminosYcondiciones.css">
+
+</head>
+<body>
+   
+    <div class="container">
+        <h1>Términos y Condiciones</h1>
+        <div class="terms">
+            <p>El PARTICIPANTE que firma la Autodescripción acepta lo siguiente:</p>
+            <ul>
+                <li>Actualizar sus descripciones sobre cualquier cambio, ya sea técnico, organizativo o legal, especialmente en relación a los atributos indicados en las descripciones.</li>
+                <li>La clave utilizada para firmar Credenciales Verificables será revocada si Gaia-X Association se entera de cualquier declaración inexacta en cuanto a las afirmaciones que resulten en un incumplimiento con el Marco de Confianza y las reglas de política definidas en el Documento de Reglas de Política y Etiquetado (PRLD).</li>
+            </ul>
+        </div>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="agree">
+            <label for="agree">Acepto los términos y condiciones</label>
+        </div>
+
+        <form action="#" th:action="@{/startTerminosCondiciones}" method="POST" enctype="multipart/form-data">
+            <div class="input-group">
+                <label for="verifiableId">Id de la Credencial Verificable  *</label>
+                <input type="text" id="verifiableId" name="verifiableId" required>
+            </div>
+          
+
+            <div class="button-container">
+                <button type="submit" class="button disabled" id="nextButton" disabled>Siguiente</button>
+            </div>
+
+            
+        </form>  
+    </div>
+
+    <script>
+        const agreeCheckbox = document.getElementById('agree');
+        const nextButton = document.getElementById('nextButton');
+
+        agreeCheckbox.addEventListener('change', function() {
+            if (agreeCheckbox.checked) {
+                nextButton.classList.remove('disabled');
+                nextButton.disabled = false;
+                localStorage.setItem('agree', 'true'); 
+            } else {
+                nextButton.classList.add('disabled');
+                nextButton.disabled = true;
+                localStorage.setItem('agree', 'false'); 
+            }
+        });
+    </script>
+</body>
+</html>

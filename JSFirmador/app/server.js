@@ -5,12 +5,25 @@ import { SignJWT, importPKCS8 } from 'jose';
 import https from 'https';
 import fs from 'fs';
 
-//creacion de la aplicacion Express, que servira de servidor web
-const app = express();
 
-//Middleware para procesar JSON, Express, por defecto, no sabe interpretar JSON en las peticiones,convierte automáticamente el body de las peticiones en JSON para que podamos acceder a req.body.
-app.use(express.json()); 
+
+
+
+//cargamos privkey y certificate
+let privateKey  = process.env.PRIVATEKEY;
+let certificate = process.env.CERTIFICATE;
+console.log("CERTIFICATE:", certificate);
+console.log("PRIVATE KEY:", privateKey);
+
+
+var credentials = {key: privateKey, cert: certificate};
+// Aquí monto el API REST para crear el JWS según la petición que reciba
+const app = express();
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+var httpsServer = https.createServer(credentials, app);
+
+
 
 //Puerto donde escuchará el servidor
 const PORT_HTTPS = 2002;
@@ -21,8 +34,6 @@ const PORT_HTTPS = 2002;
 httpsServer.listen(PORT_HTTPS,() => {
   console.log("Server HTTPS Listening on PORT:", PORT_HTTPS);
 });
-
-
 
 
 // Función que firma un VC como JWT (vc+jwt)

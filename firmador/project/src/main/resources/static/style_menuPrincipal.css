@@ -33,7 +33,7 @@ h1 {
 }
 
 
-.legalPerson-button {
+.general-button {
     background-color: #6366f1; 
     border: none;
     border-radius: 8px;
@@ -50,13 +50,13 @@ h1 {
     box-shadow: 0 3px 10px rgba(99, 102, 241, 0.2); 
 }
 
-.legalPerson-button:hover {
+.general-button:hover {
     background-color: #4f46e5; 
     box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3); 
     transform: translateY(-2px); 
 }
 
-.legalPerson-button:active {
+.general-button:active {
     background-color: #4338ca; 
     transform: translateY(1px); 
 }

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cargar Documentos</title>
+  <style>
+    body {
+      background-color: #f9f9fb;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      color: #4f46e5;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .section {
+      margin-bottom: 35px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f8f9fc;
+    }
+
+    .placeholder {
+      color: #888;
+      font-style: italic;
+    }
+
+    .file-upload {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .file-upload label {
+      flex: 1;
+      font-size: 15px;
+    }
+
+    .file-upload input[type="file"] {
+      flex: 2;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .submit-btn {
+      margin-top: 30px;
+      background-color: #6c63ff;
+      color: white;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #574fd6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cargar Información</h1>
+
+    <!-- Apartado 1: Buscar en la base de datos -->
+    <div class="section">
+      <h2>🔍 Buscar en la base de datos</h2>
+      <p class="placeholder">Esta sección aún no está implementada.</p>
+    </div>
+
+    <!-- Apartado 2: Cargar archivos locales -->
+    <div class="section">
+      <h2>📁 Cargar archivos locales (JSON)</h2>
+
+      <div class="file-upload">
+        <label for="legalPersonFile">Legal Person:</label>
+        <input type="file" id="legalPersonFile" accept=".json">
+      </div>
+
+      <div class="file-upload">
+        <label for="termsFile">Términos y Condiciones:</label>
+        <input type="file" id="termsFile" accept=".json">
+      </div>
+
+      <div class="file-upload">
+        <label for="lrnFile">Número de Registro Legal:</label>
+        <input type="file" id="lrnFile" accept=".json">
+      </div>
+    </div>
+
+    <button class="submit-btn">Enviar</button>
+  </div>
+</body>
+</html>

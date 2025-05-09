@@ -39,7 +39,7 @@ class ControllerFirmador {
     private FuncionesAuxiliares faux=new FuncionesAuxiliares();
 
 
-    //inicio 
+/////////////////////////////  MENU PRINCIPAL ///////////////////////////////////////////
     @GetMapping("/")
         public String handleInit() {
 
@@ -48,12 +48,18 @@ class ControllerFirmador {
     }
 
 
+
+/////////////////////////////  LEGAL PERSON  ///////////////////////////////////////////
+
     @GetMapping("/startLegalPerson")
         public String handleGetStartLegalPerson() {
 
             return "legalPerson";
             
     }
+
+
+    
 
     @PostMapping("/startLegalPerson")
     public String handlePostStartLegalPerson(
@@ -90,6 +96,67 @@ class ControllerFirmador {
 
 
 
+/////////////////////////////  TEMINOS Y CONDICIONES  ///////////////////////////////////////////
+
+    @GetMapping("/startTerminosCondiciones")
+    public String handleGetStartTerminosCondiciones() {
+
+        return "terminosYcondiciones";
+        
+    }
+
+
+
+    @PostMapping("/startTerminosCondiciones")
+    public String handlePostStartTerminosCondiciones(
+        @RequestParam("verifiableId") String verifiableId,
+        Model model){
+
+
+
+            try {
+                String jsonGenerado = faux.generarJsonLDTerminosCondiciones(verifiableId);
+        
+                logger.info("\n" + jsonGenerado);
+        
+                //model.addAttribute("jsonGenerado", jsonGenerado); // si quieres mandarlo a la vista
+        
+                return "peticionDatos";
+        
+        } catch (JsonProcessingException e) {
+            logger.log(Level.SEVERE, "Error generando el JSON-LD: ", e);
+            // Puedes devolver una vista de error o redirigir:
+            return "error"; // nombre de la vista de error
+        } 
+
+
+
+
+    }
+
+
+
+
+/////////////////////////////  PRESENTACION VERIFICABLE   ///////////////////////////////////////////
+
+    @GetMapping("/startRequisitos")
+    public String handleGetStartRequisitos() {
+
+        return "requisitosPresentacion";
+        
+    }
+
+
+    @GetMapping("/startPresentacionVerificable")
+    public String handleGetStartPresentacionVerificable() {
+
+        return "presentacionVerificable";
+        
+    }
+
+
+/////////////////////////////  PETICION DE DATOS   ///////////////////////////////////////////
+
 
     @PostMapping("/upload")
     public String handleUpload(
@@ -97,6 +164,7 @@ class ControllerFirmador {
         @RequestParam("seleccion") String alias,
         @RequestParam("contrasena") String contrasena,
         @RequestParam("json") String json,
+        @RequestParam("typeJson") String typeJson,
         Model model) throws IOException {
 
             
@@ -144,6 +212,8 @@ class ControllerFirmador {
             // Llamar a la API REST para firmar el JSON como JWT
             String jwtResponse = faux.httpPetition(privateKey, json);
             logger.info("Respuesta del firmador (JWT): " + jwtResponse);
+
+            //
 
             model.addAttribute("jwtResponse", jwtResponse);
             return "muestraJws"; 
