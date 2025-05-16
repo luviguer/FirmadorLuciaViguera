@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firmador</title>
+    <link rel="stylesheet" href="style_menuPrincipal.css">
+
+</head>
+<body>
+    <div class="container">    
+        <h1>Inicio de sesion</h1> 
+        <form th:action="@{/auth}" method="GET" enctype="multipart/form-data"> 
+            <button type="submit" class="general-button">Auth</button>
+        </form>     
+        
+        <form th:action="@{/login}" method="GET" enctype="multipart/form-data"> 
+            <button type="submit" class="general-button">Login</button>
+        </form>
+
+       
+</body>
+</html>

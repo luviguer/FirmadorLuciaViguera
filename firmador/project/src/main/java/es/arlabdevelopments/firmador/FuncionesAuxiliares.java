@@ -179,7 +179,7 @@ public String generarJsonLDTerminosCondiciones(String verifiableId) throws JsonP
     }
 
 
-    public String httpPetition(String pem, String json) {
+    public String httpPetitionAPI_REST(String pem, String json) {
         OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
     
@@ -215,6 +215,7 @@ public String generarJsonLDTerminosCondiciones(String verifiableId) throws JsonP
 
     
     
+
 
 
 

@@ -183,22 +183,8 @@ class ControllerFirmador {
         
               
             Key clavePrivada = Libreria.clave(alias, contrasena, f);
-                  /*if (clavePrivada == null) {
-                    logger.info("No se pudo obtener la clave privada. Verifica el alias y la contraseña.");
-
-                    model.addAttribute("jsonResponse", json);
-                    model.addAttribute("lrn", credecialNumeroDeRegitro);
-                    model.addAttribute("tYc", tYc);
-                    model.addAttribute("verifiableIdTerminos", verifiableIdTerminos);
-                    model.addAttribute("verifiableIdParticipant", verifiableIdParticipant);
-                    model.addAttribute("errorMessage", "Contraseña incorrecta");
-                    
-                
-                    return "peticionDatos"; 
-                }
-                */
         
-
+    
             // Convertir clave a formato PEM
             String privateKey = "-----BEGIN PRIVATE KEY-----" +
                     Base64.getEncoder().encodeToString(clavePrivada.getEncoded()) +
@@ -210,10 +196,14 @@ class ControllerFirmador {
             
 
             // Llamar a la API REST para firmar el JSON como JWT
-            String jwtResponse = faux.httpPetition(privateKey, json);
+            String jwtResponse = faux.httpPetitionAPI_REST(privateKey, json);
             logger.info("Respuesta del firmador (JWT): " + jwtResponse);
 
-            //
+            
+
+            
+
+
 
             model.addAttribute("jwtResponse", jwtResponse);
             return "muestraJws"; 
