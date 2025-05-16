@@ -36,7 +36,7 @@ class ControllerFirmador {
     Logger logger = Logger.getLogger("Pruebas SpringBoot controllerFirmador");
 
     @Autowired
-    private FuncionesAuxiliares faux=new FuncionesAuxiliares();
+    private FuncionesAuxiliares faux;
 
 
 /////////////////////////////  MENU PRINCIPAL ///////////////////////////////////////////

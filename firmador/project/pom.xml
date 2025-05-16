@@ -104,12 +104,7 @@
 				<version>5.6.0</version>
 		</dependency>
 
-			<!-- Spring Data JPA -->
-		<dependency>
-				<groupId>org.springframework.data</groupId>
-				<artifactId>spring-data-jpa</artifactId>
-				<version>2.7.0</version>
-		</dependency>
+		
 
 		 <!-- BCrypt Password Encoder -->
 		<dependency>
@@ -118,20 +113,18 @@
 		</dependency>
 
 
-		 <!-- Jakarta Persistence API -->
 		<dependency>
-			<groupId>jakarta.persistence</groupId>
-			<artifactId>jakarta.persistence-api</artifactId>
-			<version>3.1.0</version> <!-- Use the version you need -->
-		</dependency>
-		<!-- If using a JPA implementation, such as Hibernate, include it as well -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>5.6.10.Final</version> <!-- Use the version you need -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 
 	</dependencies>
 
