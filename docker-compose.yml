@@ -1,4 +1,23 @@
 services:
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: firmadordb
+      MYSQL_USER: springuser
+      MYSQL_PASSWORD: springpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   firmador:
     container_name: firmador
     build: firmador
@@ -15,11 +34,11 @@ services:
       - API_PORT=2002
       - API_URI=jws
       - TERMS=4bd7554097444c960292b4726c2efa1373485e8a5565d94d41195214c5e0ceb3
-
-
+    depends_on:
+      - mysql
     volumes:
       - ./keystore.p12:/app/keystore.p12:ro
-      
+
   api:
     container_name: api
     build: JSFirmador
@@ -28,4 +47,5 @@ services:
     ports:
       - "2002:2002"
 
-
+volumes:
+  mysql_data:

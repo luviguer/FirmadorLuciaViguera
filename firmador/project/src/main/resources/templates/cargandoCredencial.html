@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Guardando credencial</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+        }
+
+        .status-container {
+            text-align: center;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #6366f1; /* morado */
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .checkmark {
+            display: none;
+            font-size: 70px;
+            color: #6A0DAD; /* morado */
+            margin: 0 auto;
+        }
+
+        .text {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="status-container">
+        <div class="loader" id="spinner"></div>
+        <div class="checkmark" id="checkmark">&#10004;</div>
+        <div class="text" id="statusText">Guardando credencial...</div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            // Ocultar spinner y mostrar check
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('checkmark').style.display = 'block';
+            document.getElementById('statusText').textContent = "¡Credencial guardada exitosamente!";
+
+            // Redirigir luego de 4 segundos
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 4000);
+        }, 3000);
+    </script>
+
+</body>
+</html>

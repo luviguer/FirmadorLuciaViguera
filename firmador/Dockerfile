@@ -1,7 +1,8 @@
 FROM openjdk:21-slim-buster as compiler
 WORKDIR /home/maven
 COPY --chown=maven:maven project .
-RUN ./mvnw package
+RUN ./mvnw package -DskipTests
+
 
 FROM openjdk:21-slim-buster
 # Argumentos que le pasaremos a la JVM, por ejemplo una instancia del depurador

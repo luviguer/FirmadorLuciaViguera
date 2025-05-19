@@ -12,7 +12,7 @@ import java.util.Optional;
 public class UsuarioService {
 
     @Autowired
-    public UsuarioRepository usuarioRepo;
+    private UsuarioRepository usuarioRepo;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -29,7 +29,5 @@ public class UsuarioService {
                 .filter(u -> passwordEncoder.matches(rawPassword, u.getPassword()));
     }
 
-    public Usuario guardarUsuario(Usuario usuario) {
-        return usuarioRepo.save(usuario);
-    }
+  
 }

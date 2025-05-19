@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class CredencialService {
 
     @Autowired
-    public CredencialRepository credencialRepo;
+    private CredencialRepository credencialRepo;
 
     public Credencial guardarCredencial(Usuario usuario, String tipo, String contenidoJson) {
         Credencial credencial = new Credencial();
