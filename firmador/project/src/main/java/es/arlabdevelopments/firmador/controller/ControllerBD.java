@@ -11,6 +11,14 @@ import es.arlabdevelopments.firmador.model.Usuario;
 import es.arlabdevelopments.firmador.service.UsuarioService; 
 import es.arlabdevelopments.firmador.service.CredencialService; 
 import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import es.arlabdevelopments.firmador.model.Credencial;
+
 
 import java.util.logging.Logger;
 
@@ -20,26 +28,26 @@ class ControllerDB {
 
     Logger logger = Logger.getLogger("Pruebas SpringBoot controllerFirmador");
 
-   @Autowired
+    @Autowired
     private UsuarioService usuarioService;
 
     @Autowired
     private CredencialService credencialService;
 
 
+
+
+
 /////////////////////////////  Inicio de sesion ///////////////////////////////////////////
     @GetMapping("/inicioSesion")
-        public String handleInitDB(Model model) {
-            
-            //esto se tendra que imprementar pero actualemte es una prueba 
+        public String handleInitDB(HttpSession session) {
+          
+            //guardar en sesion
             String jsonData="prueba";
-            String tipo="LegalPerson";
+            String tipo="TyC";
 
-            logger.info("jsonData recibido de mmuestraJWS: " + jsonData);
-            logger.info("tipo recibido de mmuestraJWS: " + jsonData);
-
-            model.addAttribute("jsonData",jsonData);
-            model.addAttribute("tipo",tipo);
+            session.setAttribute("jsonData", jsonData);
+            session.setAttribute("tipo", tipo);
 
             return "inicioSesion";
             
@@ -49,106 +57,168 @@ class ControllerDB {
 /////////////////////////////  Auth ///////////////////////////////////////////
 
     @GetMapping("/auth")
-        public String handleAuth(@RequestParam String jsonData,@RequestParam String tipo, Model model) {
-
-            model.addAttribute("jsonData",jsonData);
-            model.addAttribute("tipo",tipo);
-
+        public String handleAuth() {       
             return "auth";
             
     }
 
     @PostMapping("/auth")
-        public String handlAuth(
-            @RequestParam("dni") String dni,
-            @RequestParam("password") String password,
-            @RequestParam("confirmPassword") String confirmPassword,
-            @RequestParam String tipo,
-            @RequestParam String jsonData, Model model) {
+    public String handleAuth(@RequestParam("dni") String dni,
+                            @RequestParam("password") String password,
+                            @RequestParam("confirmPassword") String confirmPassword,
+                            HttpSession session,
+                            Model model) {
 
-            logger.info("Datos recibidos en /auth:");
-            logger.info("DNI: " + dni);
-            logger.info("Password: " + password);
-            logger.info("Confirm Password: " + confirmPassword);
-            logger.info("valor del json: " + jsonData);
-            logger.info("valor del tipo: " + tipo);
+        logger.info("Datos recibidos en /auth:");
+        logger.info("DNI: " + dni);
+        logger.info("Password: " + password);
+        logger.info("Confirm Password: " + confirmPassword);
 
-
-
-            if (!password.equals(confirmPassword)) {
-                logger.warning("Las contraseñas no coinciden.");
-                return "auth"; // Página de error o formulario
-            }
-
-            // Verificamos si el usuario ya existe
-            Optional<Usuario> existente = usuarioService.autenticar(dni, password);
-            if (existente.isPresent()) {
-                logger.warning("El usuario ya está registrado.");
-                return "auth"; 
-            }
-
-            // Registrar usuario
-            usuarioService.registrar(dni, password);
-            logger.info("Registro exitoso para el DNI: " + dni);
-            
-
-            return "menuPrincipal"; 
-    
+        // Validar que las contraseñas coincidan
+        if (!password.equals(confirmPassword)) {
+            logger.info("Las contraseñas no coinciden.");
+            model.addAttribute("error", "Las contraseñas no coinciden.");
+            return "auth";
         }
 
-/////////////////////////////  Login ///////////////////////////////////////////
+        // Verificar si el usuario ya existe
+        Optional<Usuario> existente = usuarioService.buscarPorIdentificador(dni);
+        if (existente.isPresent()) {
+            logger.info("El usuario ya está registrado.");
+            model.addAttribute("error", "El usuario ya está registrado.");
+            return "auth";
+        }
+
+        // Registrar nuevo usuario
+        Usuario nuevoUsuario = usuarioService.registrar(dni, password);
+        logger.info("Registro exitoso para el DNI: " + dni);
+
+        // Obtener datos de sesión
+        String jsonData = (String) session.getAttribute("jsonData");
+        String tipo = (String) session.getAttribute("tipo");
+        logger.info("Los datos de sesion:" + jsonData + "," +tipo);
 
 
-     @GetMapping("/login")
-        public String handleLogin(@RequestParam String jsonData,@RequestParam String tipo, Model model) {
 
-            logger.info("jsonData recibido de inicioSesion: " + jsonData);
-            logger.info("valor del tipo recibido de inicioSesion: " + tipo);
+        try {
+            credencialService.guardarCredencial(nuevoUsuario, tipo, jsonData);
+            logger.info("Credencial guardada correctamente para el nuevo usuario " + dni);
+        } catch (RuntimeException e) {
+            logger.warning("Error al guardar la credencial: " + e.getMessage());
+            model.addAttribute("error", "Error al guardar la credencial.");
+            return "auth";
+        }
 
-            model.addAttribute("jsonData",jsonData);
-            model.addAttribute("tipo",tipo);
-
-            return "login";
-            
+        return "cargandoCredencial";
     }
 
+            
+
+    /////////////////////////////  Login ///////////////////////////////////////////
 
 
-    @PostMapping("/login")
-    public String handleLoginSubmit(@RequestParam String dni,
+        @GetMapping("/login")
+            public String handleLogin() {
+
+                return "login";
+                
+        }
+
+
+
+        @PostMapping("/login")
+        public String handleLoginSubmit(@RequestParam String dni,
+                                        @RequestParam String password,
+                                        HttpSession session,                                   
+                                        Model model) {
+
+            
+
+            var usuarioOpt = usuarioService.autenticar(dni, password);
+
+            String jsonData = (String) session.getAttribute("jsonData");
+            String tipo = (String) session.getAttribute("tipo");
+            logger.info("Lod datos de sesion" + jsonData + "," +tipo);
+
+            if (usuarioOpt.isPresent()) {
+                Usuario usuario = usuarioOpt.get();
+                logger.info("Loggin exitoso para el DNI: " + dni);
+
+                try {
+                    credencialService.guardarCredencial(usuario, tipo, jsonData);
+                    logger.info("Credencial guardada correctamente para el usuario " + dni);
+                } catch (RuntimeException e) {
+                    logger.info("Error al guardar la credencial: " + e.getMessage());
+                    model.addAttribute("error", "Error al guardar la credencial.");
+                    
+                    return "login";
+                }
+
+                return "cargandoCredencial";
+            } else {
+                logger.info("No se ha encontrado: " + dni);
+                model.addAttribute("error", "DNI o contraseña incorrectos.");
+
+                return "login";
+            }
+        }
+
+
+
+
+
+
+
+////////////////// BUSCAR CREDENCIALES PARA PRESENTACION   ///////////////////////////////////
+
+
+    @PostMapping("/buscarCredenciales")
+    public String buscarCredenciales(@RequestParam String dni,
                                     @RequestParam String password,
-                                    @RequestParam String jsonData,
-                                    @RequestParam String tipo,
+                                    HttpSession session,
                                     Model model) {
-
-        logger.info("valor del json para ya guardar: " + jsonData);
-        logger.info("valor del tipo para ya guardar: " + tipo);
 
         var usuarioOpt = usuarioService.autenticar(dni, password);
 
-        if (usuarioOpt.isPresent()) {
-            Usuario usuario = usuarioOpt.get();
-            logger.info("Loggin exitoso para el DNI: " + dni);
-
-            try {
-                credencialService.guardarCredencial(usuario, tipo, jsonData);
-                logger.info("Credencial guardada correctamente para el usuario " + dni);
-            } catch (RuntimeException e) {
-                logger.info("Error al guardar la credencial: " + e.getMessage());
-                return "login";
-            }
-
-            return "cargandoCredencial";
-        } else {
-            logger.info("No se ha encontrado: " + dni);
-            return "login";
+        if (usuarioOpt.isEmpty()) {
+            model.addAttribute("error", "DNI o contraseña incorrectos.");
+            return "presentacionVerificable";
         }
+
+        Usuario usuario = usuarioOpt.get();
+        List<Credencial> credenciales = credencialService.obtenerCredencialesPorUsuario(usuario);
+
+        String legalPerson = null;
+        String terms = null;
+
+        for (Credencial c : credenciales) {
+            if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
+                legalPerson = c.getContenidoJson();
+            } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
+                terms = c.getContenidoJson();
+            }
+        }
+
+        int count = 0;
+        if (legalPerson != null) {
+            session.setAttribute("credencial_legalPerson", legalPerson);
+            count++;
+        }
+        if (terms != null) {
+            session.setAttribute("credencial_terms", terms);
+            count++;
+        }
+
+        if (count == 2) {
+            model.addAttribute("mensaje", "Credenciales encontradas, listo para continuar");
+        } else if (count == 1) {
+            model.addAttribute("error", "Falta una de las credenciales.");
+        } else {
+            model.addAttribute("error", "No se encontraron credenciales para este usuario.");
+        }
+
+        return "presentacionVerificable";
     }
-
-
-
-
-
 
 
 

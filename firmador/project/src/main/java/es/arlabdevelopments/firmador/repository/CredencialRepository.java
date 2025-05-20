@@ -9,4 +9,8 @@ import java.util.List;
 public interface CredencialRepository extends JpaRepository<Credencial, Long> {
     List<Credencial> findByUsuario_Id(Long usuarioId);
 }
+
+
+
+
  

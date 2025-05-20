@@ -29,5 +29,9 @@ public class UsuarioService {
                 .filter(u -> passwordEncoder.matches(rawPassword, u.getPassword()));
     }
 
+    public Optional<Usuario> buscarPorIdentificador(String identificador) {
+        return usuarioRepo.findByIdentificador(identificador);
+    }
+
   
 }

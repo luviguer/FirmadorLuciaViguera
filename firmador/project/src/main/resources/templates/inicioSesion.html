@@ -11,14 +11,12 @@
     <div class="container">    
         <h1>Inicio de sesion</h1> 
         <form th:action="@{/auth}" method="GET" enctype="multipart/form-data"> 
-             <input type="hidden" name="jsonData" th:value="${jsonData}">
-            <input type="hidden" name="tipo" th:value="${tipo}">
+            
             <button type="submit" class="general-button">Auth</button>
         </form>     
         
         <form th:action="@{/login}" method="GET" enctype="multipart/form-data"> 
-             <input type="hidden" name="jsonData" th:value="${jsonData}">
-             <input type="hidden" name="tipo" th:value="${tipo}">
+             
             <button type="submit" class="general-button">Login</button>
         </form>
 
