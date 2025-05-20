@@ -50,11 +50,9 @@
                     <label for="check"> Mostrar contraseña</label>
                 </div>
 
-                <input type="hidden" id="json" name="json" th:value="${jsonResponse}" />
-                <input type="hidden" id="lrn" name="lrn" th:value="${lrn}" />
-                <input type="hidden" id="tYc" name="tYc" th:value="${tYc}" />
-                <input type="hidden" id="verifiableIdTerminos" name="verifiableIdTerminos" th:value="${verifiableIdTerminos}" />
-                <input type="hidden" id="verifiableIdParticipant" name="verifiableIdParticipant" th:value="${verifiableIdParticipant}" />
+                <input type="hidden" id="typeJson" name="typeJson" th:value="${typeJson}" />
+                <input type="hidden" id="jsonGenerado" name="jsonGenerado" th:value="${jsonGenerado}" />
+               
 
                 <button type="submit">Crear JWS</button>
             </form>

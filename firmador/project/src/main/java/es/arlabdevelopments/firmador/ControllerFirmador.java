@@ -80,7 +80,8 @@ class ControllerFirmador {
             
                     logger.info("\n" + jsonGenerado);
             
-                    //model.addAttribute("jsonGenerado", jsonGenerado); // si quieres mandarlo a la vista
+                    model.addAttribute("jsonGenerado", jsonGenerado); 
+                    model.addAttribute("typeJson","LegalPerson");
             
                     return "peticionDatos";
             
@@ -119,14 +120,13 @@ class ControllerFirmador {
         
                 logger.info("\n" + jsonGenerado);
         
-                //model.addAttribute("jsonGenerado", jsonGenerado); // si quieres mandarlo a la vista
-        
+                model.addAttribute("jsonGenerado", jsonGenerado); 
+                model.addAttribute("typeJson","TyC");
                 return "peticionDatos";
         
         } catch (JsonProcessingException e) {
             logger.log(Level.SEVERE, "Error generando el JSON-LD: ", e);
-            // Puedes devolver una vista de error o redirigir:
-            return "error"; // nombre de la vista de error
+            return "error"; 
         } 
 
 
@@ -155,7 +155,7 @@ class ControllerFirmador {
     }
 
 
-/////////////////////////////  PETICION DE DATOS   ///////////////////////////////////////////
+/////////////////////////////  PETICION DE DATOS Y LLAMAR A LA API  ///////////////////////////////////////////
 
 
     @PostMapping("/upload")
@@ -163,7 +163,7 @@ class ControllerFirmador {
         @RequestParam("archivo") MultipartFile file,
         @RequestParam("seleccion") String alias,
         @RequestParam("contrasena") String contrasena,
-        @RequestParam("json") String json,
+        @RequestParam("jsonGenerado") String jsonGenerado,
         @RequestParam("typeJson") String typeJson,
         Model model) throws IOException {
 
@@ -196,7 +196,7 @@ class ControllerFirmador {
             
 
             // Llamar a la API REST para firmar el JSON como JWT
-            String jwtResponse = faux.httpPetitionAPI_REST(privateKey, json);
+            String jwtResponse = faux.httpPetitionAPI_REST(privateKey, jsonGenerado);
             logger.info("Respuesta del firmador (JWT): " + jwtResponse);
 
             

@@ -27,13 +27,13 @@
     <h1>Tu credencial verificable</h1>
 
     <div class="tab-container">
-        <div class="tab active" data-tab="jsonData" onclick="showJson('jsonData')">Legal Person</div>
+        <div class="tab active" data-tab="jsonData" onclick="showJson('jsonData')">Credencial</div>
         
     </div>
 
     <div id="jsonData" class="json-container active">
         <button onclick="copyToClipboard('jsonData')">Copy JSON</button>
-        <pre th:text="${jsonService}"></pre>
+        <pre th:text="${jsonData}"></pre>
     </div>
 
 

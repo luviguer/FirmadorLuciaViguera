@@ -29,7 +29,7 @@ services:
       - TYPE=VerifiableCredential 
       - TYPE_LegalPerson=gx:LegalPerson
       - ISSUER=did:web:arlabdevelopments.com
-      - API_PROTOCOL=http
+      - API_PROTOCOL=https
       - API_HOST=lucia.arlabdevelopments.com
       - API_PORT=2002
       - API_URI=jws

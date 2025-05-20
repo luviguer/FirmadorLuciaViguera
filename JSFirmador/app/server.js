@@ -6,9 +6,6 @@ import https from 'https';
 import fs from 'fs';
 
 
-
-
-
 //cargamos privkey y certificate
 let privateKey  = process.env.PRIVATEKEY;
 let certificate = process.env.CERTIFICATE;
@@ -69,3 +66,8 @@ app.post('/jws', async (req, res) => {
     }
   });
 
+
+
+
+
+  
