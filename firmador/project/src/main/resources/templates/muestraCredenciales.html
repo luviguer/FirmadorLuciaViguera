@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Credenciales</title>
+    <link rel="stylesheet" href="./style_muestraCredenciales.css">
+
+    <script>
+        // Copiar JSON al portapapeles
+        function copyToClipboard(containerId) {
+            const text = document.querySelector(`#${containerId} pre`).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('¡JSON copiado al portapapeles!');
+            }).catch(err => {
+                console.error('Error al copiar el texto: ', err);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Credenciales Verificables</h1>
+
+    <div class="tab-container">
+    <div class="tab active" data-tab="jsonData" th:if="${legalPerson != null}" onclick="showJson('jsonData')">
+        Credencial Legal Person
+    </div>
+        <div class="tab active" data-tab="jsonData" th:if="${terms != null}" onclick="showJson('jsonData')">
+            Credencial Términos y Condiciones
+        </div>
+    </div>
+
+    <div id="jsonData" class="json-container active">
+        <div th:if="${legalPerson != null}">
+            <h3>Credencial Legal Person</h3>
+            <pre th:text="${legalPerson}"></pre>
+        </div>
+        <div th:if="${terms != null}">
+            <h3>Credencial Términos y Condiciones</h3>
+            <pre th:text="${terms}"></pre>
+        </div>
+    </div>
+
+    <!-- Botón para regresar a la página de inicio -->
+    <form th:action="@{/}" method="GET">
+        <button class="inicio" type="submit">Regresar al inicio</button>
+    </form>
+</body>
+</html>

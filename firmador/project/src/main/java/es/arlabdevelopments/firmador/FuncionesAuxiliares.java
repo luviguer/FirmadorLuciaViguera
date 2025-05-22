@@ -23,6 +23,7 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.FormBody;
 
 @Service
 public class FuncionesAuxiliares {
@@ -178,14 +179,15 @@ public String generarJsonLDTerminosCondiciones(String verifiableId) throws JsonP
         return f;
     }
 
-
+/////////////////////////////////// PETICION API /////////////////////////////////////////////////
     public String httpPetitionAPI_REST(String pem, String json) {
         OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
     
-        RequestBody body = RequestBody.create(mediaType,
-            "pem=" + URLEncoder.encode(pem, StandardCharsets.UTF_8) +
-            "&json=" + URLEncoder.encode(json, StandardCharsets.UTF_8));
+        RequestBody body = new FormBody.Builder()
+                .add("pem", pem)
+                .add("json", json)
+                .build();       
     
         String url = System.getenv("API_PROTOCOL") + "://" +
                      System.getenv("API_HOST") + ":" +

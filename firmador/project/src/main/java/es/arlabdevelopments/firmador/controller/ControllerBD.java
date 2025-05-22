@@ -39,15 +39,17 @@ class ControllerDB {
 
 
 /////////////////////////////  Inicio de sesion ///////////////////////////////////////////
-    @GetMapping("/inicioSesion")
-        public String handleInitDB(HttpSession session) {
-          
-            //guardar en sesion
-            String jsonData="prueba";
-            String tipo="TyC";
+    @PostMapping("/inicioSesion")
+        public String handleInitDB(@RequestParam("typeJson") String typeJson,
+                    @RequestParam("jsonData") String jsonData,
+                    HttpSession session,
+                    Model model) {
 
+          
+
+            //guardar en sesion
             session.setAttribute("jsonData", jsonData);
-            session.setAttribute("tipo", tipo);
+            session.setAttribute("typeJson", typeJson);
 
             return "inicioSesion";
             
@@ -95,13 +97,13 @@ class ControllerDB {
 
         // Obtener datos de sesión
         String jsonData = (String) session.getAttribute("jsonData");
-        String tipo = (String) session.getAttribute("tipo");
-        logger.info("Los datos de sesion:" + jsonData + "," +tipo);
+        String typeJson = (String) session.getAttribute("typeJson");
+        logger.info("Los datos de sesion:" + jsonData + "," +typeJson);
 
 
 
         try {
-            credencialService.guardarCredencial(nuevoUsuario, tipo, jsonData);
+            credencialService.guardarCredencial(nuevoUsuario, typeJson, jsonData);
             logger.info("Credencial guardada correctamente para el nuevo usuario " + dni);
         } catch (RuntimeException e) {
             logger.warning("Error al guardar la credencial: " + e.getMessage());
@@ -127,41 +129,58 @@ class ControllerDB {
 
 
         @PostMapping("/login")
-        public String handleLoginSubmit(@RequestParam String dni,
-                                        @RequestParam String password,
-                                        HttpSession session,                                   
-                                        Model model) {
+             public String handleLoginSubmit(@RequestParam String dni,
+                                    @RequestParam String password,
+                                    HttpSession session,
+                                    Model model) {
 
-            
+                var usuarioOpt = usuarioService.autenticar(dni, password);
+                String jsonData = (String) session.getAttribute("jsonData");
+                String typeJson = (String) session.getAttribute("typeJson"); // Usamos esto para decidir el flujo
 
-            var usuarioOpt = usuarioService.autenticar(dni, password);
+                logger.info("Datos de sesión: jsonData=" + jsonData + ", typeJson=" + typeJson);
 
-            String jsonData = (String) session.getAttribute("jsonData");
-            String tipo = (String) session.getAttribute("tipo");
-            logger.info("Lod datos de sesion" + jsonData + "," +tipo);
+                if (usuarioOpt.isPresent()) {
+                    Usuario usuario = usuarioOpt.get();
+                    logger.info("Login exitoso para el DNI: " + dni);
 
-            if (usuarioOpt.isPresent()) {
-                Usuario usuario = usuarioOpt.get();
-                logger.info("Loggin exitoso para el DNI: " + dni);
+                    if (typeJson != null && jsonData != null) {
+                        //  Caso 1: crear credencial
+                        try {
+                            credencialService.guardarCredencial(usuario, typeJson, jsonData);
+                            logger.info("Credencial guardada correctamente para el usuario " + dni);
+                            return "cargandoCredencial";
+                        } catch (RuntimeException e) {
+                            logger.info("Error al guardar la credencial: " + e.getMessage());
+                            model.addAttribute("error", "Error al guardar la credencial.");
+                            return "login";
+                        }
+                    } else {
+                        // Caso 2: ver credenciales
+                        List<Credencial> credenciales = credencialService.obtenerCredencialesPorUsuario(usuario);
+                        String legalPerson = null;
+                        String terms = null;
 
-                try {
-                    credencialService.guardarCredencial(usuario, tipo, jsonData);
-                    logger.info("Credencial guardada correctamente para el usuario " + dni);
-                } catch (RuntimeException e) {
-                    logger.info("Error al guardar la credencial: " + e.getMessage());
-                    model.addAttribute("error", "Error al guardar la credencial.");
-                    
+                        for (Credencial c : credenciales) {
+                            if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
+                                legalPerson = c.getContenidoJson();
+                            } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
+                                terms = c.getContenidoJson();
+                            }
+                        }
+
+                        model.addAttribute("legalPerson", legalPerson);
+                        model.addAttribute("terms", terms);
+                        return "muestraCredenciales";
+                    }
+
+                } else {
+                    logger.info("No se ha encontrado el usuario: " + dni);
+                    model.addAttribute("error", "DNI o contraseña incorrectos.");
                     return "login";
                 }
-
-                return "cargandoCredencial";
-            } else {
-                logger.info("No se ha encontrado: " + dni);
-                model.addAttribute("error", "DNI o contraseña incorrectos.");
-
-                return "login";
             }
-        }
+
 
 
 
@@ -219,7 +238,6 @@ class ControllerDB {
 
         return "presentacionVerificable";
     }
-
 
 
 

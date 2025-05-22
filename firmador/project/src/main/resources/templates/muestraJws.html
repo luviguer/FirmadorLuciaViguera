@@ -27,7 +27,10 @@
     <h1>Tu credencial verificable</h1>
 
     <div class="tab-container">
-        <div class="tab active" data-tab="jsonData" onclick="showJson('jsonData')">Credencial</div>
+        <div class="tab active" data-tab="jsonData" onclick="showJson('jsonData')">
+        <span th:if="${typeJson == 'LegalPerson'}">Credencial Legal Person</span>
+        <span th:if="${typeJson == 'TyC'}">Credencial Términos y Condiciones</span>
+    </div>
         
     </div>
 
@@ -41,7 +44,14 @@
         <button class="inicio" type="submit">Crear Otra Credencial</button>
     </form>
 
-  
+    <form th:action="@{/inicioSesion}" method="POST" enctype="multipart/form-data">
+        <button class="inicio" type="submit">Guardar credencial</button>
+        <input type="hidden" id="typeJson" name="typeJson" th:value="${typeJson}" />
+        <input type="hidden" id="jsonData" name="jsonData" th:value="${jsonData}" />
+    </form>
+
+    
+
 
 </body>
 </html>

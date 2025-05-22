@@ -19,7 +19,8 @@ import es.arlabdevelopments.firmador.model.TipoCredencial;
 
 
 @Entity
-@Table(name = "credenciales")
+@Table(name = "credenciales",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"usuario_id", "tipo"}))
 public class Credencial {
 
     @Id
@@ -31,7 +32,7 @@ public class Credencial {
     private TipoCredencial tipo; 
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String contenidoJson;
 
     @ManyToOne(fetch = FetchType.LAZY)

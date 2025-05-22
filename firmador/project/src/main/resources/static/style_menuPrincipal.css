@@ -64,6 +64,18 @@ h1 {
 
 
 
+.section {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+h2 {
+    font-size: 1.2rem;
+    color: #6366f1;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
 
 
 
