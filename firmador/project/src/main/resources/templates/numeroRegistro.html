@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Legal Registration Number</title>
+    <link rel="stylesheet" href="style_legalPerson.css">
+</head>
+<body>
+    <h2>Legal Registration Number Form</h2>
+    <form th:action="@{/startLRN}" method="POST" enctype="multipart/form-data">
+        
+        <label for="verifiableId" class="bold-label">Verifiable Credential ID</label>
+        <input type="text" id="verifiableId" name="verifiableId" required>
+
+        <label for="subjectId" class="bold-label">Subject ID</label>
+        <input type="text" id="subjectId" name="subjectId" required>
+
+        <label for="lrnValue" class="bold-label">Legal Registration Number (LRN) *</label>
+        <select id="lrnValue" name="lrnValue" required>
+            <option value="EORI">EORI</option>
+            <option value="VAT_ID">VAT ID</option>
+            <option value="LEI_Code">LEI Code</option>
+        </select>
+        <input type="text" id="lrn" name="lrn" required>
+
+        <input type="hidden" id="typeJson" name="typeJson" value="LegalPerson">
+
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>

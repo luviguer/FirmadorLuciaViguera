@@ -105,6 +105,9 @@ class ControllerDB {
         try {
             credencialService.guardarCredencial(nuevoUsuario, typeJson, jsonData);
             logger.info("Credencial guardada correctamente para el nuevo usuario " + dni);
+            session.setAttribute("jsonData", null);
+            session.setAttribute("typeJson", null);
+
         } catch (RuntimeException e) {
             logger.warning("Error al guardar la credencial: " + e.getMessage());
             model.addAttribute("error", "Error al guardar la credencial.");
@@ -149,6 +152,9 @@ class ControllerDB {
                         try {
                             credencialService.guardarCredencial(usuario, typeJson, jsonData);
                             logger.info("Credencial guardada correctamente para el usuario " + dni);
+                            session.setAttribute("jsonData", null);
+                            session.setAttribute("typeJson", null);
+
                             return "cargandoCredencial";
                         } catch (RuntimeException e) {
                             logger.info("Error al guardar la credencial: " + e.getMessage());
@@ -160,17 +166,27 @@ class ControllerDB {
                         List<Credencial> credenciales = credencialService.obtenerCredencialesPorUsuario(usuario);
                         String legalPerson = null;
                         String terms = null;
+                        String lrn = null;
 
                         for (Credencial c : credenciales) {
+                            System.out.println("Encontrada credencial tipo: " + c.getTipo().name());
+
                             if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
                                 legalPerson = c.getContenidoJson();
+                                System.out.println("Asignada a legalPerson");
                             } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
                                 terms = c.getContenidoJson();
+                                System.out.println("Asignada a terms");
+                            } else if (c.getTipo().name().equalsIgnoreCase("LRN")) {
+                                lrn = c.getContenidoJson();
+                                System.out.println("Asignada a lrn");
                             }
                         }
 
+
                         model.addAttribute("legalPerson", legalPerson);
                         model.addAttribute("terms", terms);
+                        model.addAttribute("lrn", lrn);
                         return "muestraCredenciales";
                     }
 
@@ -209,14 +225,22 @@ class ControllerDB {
 
         String legalPerson = null;
         String terms = null;
+        String lrn = null;
 
         for (Credencial c : credenciales) {
-            if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
-                legalPerson = c.getContenidoJson();
-            } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
-                terms = c.getContenidoJson();
-            }
-        }
+             System.out.println("Encontrada credencial tipo: " + c.getTipo().name());
+
+                if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
+                        legalPerson = c.getContenidoJson();
+                        System.out.println("Asignada a legalPerson");
+                } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
+                        terms = c.getContenidoJson();
+                        System.out.println("Asignada a terms");
+                        } else if (c.getTipo().name().equalsIgnoreCase("LRN")) {
+                        lrn = c.getContenidoJson();
+                        System.out.println("Asignada a lrn");
+                        }
+                }
 
         int count = 0;
         if (legalPerson != null) {
@@ -228,12 +252,19 @@ class ControllerDB {
             count++;
         }
 
-        if (count == 2) {
+        if (lrn != null) {
+            session.setAttribute("credencial_lrn", terms);
+            count++;
+        }
+
+        if (count == 3) {
             model.addAttribute("mensaje", "Credenciales encontradas, listo para continuar");
-        } else if (count == 1) {
-            model.addAttribute("error", "Falta una de las credenciales.");
-        } else {
-            model.addAttribute("error", "No se encontraron credenciales para este usuario.");
+        } else if (count == 2) {
+            model.addAttribute("error", "Faltan una de las credenciales.");
+        } else if (count == 2) {
+            model.addAttribute("error", "Faltan dos de las credenciales.");
+        }else{
+            model.addAttribute("error", "Faltan todas las credenciales.");
         }
 
         return "presentacionVerificable";

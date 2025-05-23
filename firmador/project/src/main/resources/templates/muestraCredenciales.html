@@ -22,11 +22,14 @@
     <h1>Credenciales Verificables</h1>
 
     <div class="tab-container">
-    <div class="tab active" data-tab="jsonData" th:if="${legalPerson != null}" onclick="showJson('jsonData')">
-        Credencial Legal Person
-    </div>
+        <div class="tab active" data-tab="jsonData" th:if="${legalPerson != null}" onclick="showJson('jsonData')">
+            Credencial Legal Person
+        </div>
         <div class="tab active" data-tab="jsonData" th:if="${terms != null}" onclick="showJson('jsonData')">
             Credencial Términos y Condiciones
+        </div>
+        <div class="tab active" data-tab="jsonData" th:if="${lrn != null}" onclick="showJson('jsonData')">
+            Credencial Numero de registro legal
         </div>
     </div>
 
@@ -38,6 +41,10 @@
         <div th:if="${terms != null}">
             <h3>Credencial Términos y Condiciones</h3>
             <pre th:text="${terms}"></pre>
+        </div>
+        <div th:if="${lrn != null}">
+            <h3>Credencial Numero de registro legal</h3>
+            <pre th:text="${lrn}"></pre>
         </div>
     </div>
 

@@ -24,7 +24,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.FormBody;
-
+import java.io.UnsupportedEncodingException;
 @Service
 public class FuncionesAuxiliares {
     
@@ -219,6 +219,74 @@ public String generarJsonLDTerminosCondiciones(String verifiableId) throws JsonP
     
 
 
+
+///////////////////////// PETICION LRN ////////////////////////////////////////////////////
+
+
+public String httpPetitionLrn(String verifiableId, String subjectId, String lrnValue, String lrnType) {
+    OkHttpClient client = new OkHttpClient();
+
+    String encodedVerifiableId = "";
+    String encodedSubjectId = "";
+
+    try {
+        encodedVerifiableId = URLEncoder.encode(verifiableId, StandardCharsets.UTF_8.toString());
+        encodedSubjectId = URLEncoder.encode(subjectId, StandardCharsets.UTF_8.toString());
+    } catch (UnsupportedEncodingException e) {
+        logger.severe("Error al codificar parámetros URL: " + e.getMessage());
+        throw new RuntimeException(e);
+    }
+
+    // Mapear el tipo al formato correcto de la URL
+    String endpointType;
+    switch (lrnType.toUpperCase()) {
+        case "VAT_ID":
+            endpointType = "vat-id";
+            break;
+        case "LEI_CODE":
+            endpointType = "lei-code";
+            break;
+        case "EORI":
+            endpointType = "eori";
+            break;
+        default:
+            throw new IllegalArgumentException("Tipo de LRN no válido: " + lrnType);
+    }
+
+    String baseUrl = "https://gx-notary.arsys.es/v2/registration-numbers/";
+    String fullUrl = baseUrl + endpointType + "/" + lrnValue +
+                     "?vcId=" + encodedVerifiableId + "&subjectId=" + encodedSubjectId;
+
+    Request request = new Request.Builder()
+            .url(fullUrl)
+            .get()
+            .addHeader("Accept", "application/vc+jwt")
+            .build();
+
+    try (Response response = client.newCall(request).execute()) {
+        logger.severe("Código de respuesta: " + response.code());
+
+        if (!response.isSuccessful()) {
+            int responseCode = response.code();
+            String errorMessage = String.format("Error en la llamada a la API. HTTP code: %d, Message: %s",
+                                                responseCode, response.message());
+            logger.severe(errorMessage);
+
+            if (responseCode == 400) {
+                return "Error 400: Parámetros inválidos.";
+            } else if (responseCode == 404) {
+                return "Error 404: Código no encontrado.";
+            }
+
+            throw new RuntimeException(errorMessage);
+        }
+
+        return response.body().string();
+    } catch (IOException e) {
+        logger.severe("Error en la ejecución de la llamada a la API: " + e.getMessage());
+        throw new RuntimeException(e);
+    }
+}
 
 
 

@@ -244,7 +244,39 @@ class ControllerFirmador {
 
     }
 
+////////////////////////////////// LRN ///////////////////////////////////////////////
 
+
+
+    @GetMapping("/startLRN")
+    public String handleGetStartLRN() {
+
+        return "numeroRegistro";
+        
+    }
+
+
+    @PostMapping("/startLRN")
+    public String handleLRNP(
+            @RequestParam("verifiableId") String verifiableId,
+            @RequestParam("subjectId") String subjectId,
+            @RequestParam("lrnValue") String lrnType, 
+            @RequestParam("lrn") String lrnValue,        
+            Model model) {
+
+        System.out.println("Verifiable ID: " + verifiableId);
+        System.out.println("Subject ID: " + subjectId);
+        System.out.println("LRN Type: " + lrnType);
+        System.out.println("LRN Value: " + lrnValue);
+
+        String jwtCredential = faux.httpPetitionLrn(verifiableId, subjectId, lrnValue, lrnType);
+        logger.info("Valor de jwtCredential: " + jwtCredential);
+
+        model.addAttribute("jsonData", jwtCredential);
+        model.addAttribute("typeJson", "LRN");
+
+        return "muestraJws";
+    }
 
 
 
