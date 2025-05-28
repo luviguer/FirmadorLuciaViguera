@@ -73,7 +73,7 @@ app.post('/jws', async (req, res) => {
       const issuer = 'did:web:arlabdevelopments.com';
 
       const signedJWT = await signVCasJWT(verifiableCredential, pem, issuer);
-      res.send({ jwt: signedJWT });
+      res.send(signedJWT);
 
     } catch (err) {
       console.error("Error firmando el VC:", err);

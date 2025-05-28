@@ -22,6 +22,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
+import java.util.ArrayList;
+
 
 import es.arlabdevelopments.firmador.Libreria;
 import java.security.Key;
@@ -161,7 +163,6 @@ class ControllerFirmador {
     @PostMapping("/upload")
     public String handleUpload(
         @RequestParam("archivo") MultipartFile file,
-        @RequestParam("seleccion") String alias,
         @RequestParam("contrasena") String contrasena,
         @RequestParam("jsonGenerado") String jsonGenerado,
         @RequestParam("typeJson") String typeJson,
@@ -174,7 +175,8 @@ class ControllerFirmador {
             }
 
             File f = faux.creaFichero(file);  
-            model.addAttribute("aliases", Libreria.comprobarAlias(f));
+            ArrayList<String> aliasArray=Libreria.comprobarAlias(f);
+            String alias= aliasArray.get(0);
             logger.info("Nombre del fichero: " + f.getName());
             logger.info("Valor del alias: " + alias);
             logger.info("Valor de la contraseña: " + contrasena);
@@ -272,8 +274,13 @@ class ControllerFirmador {
         String jwtCredential = faux.httpPetitionLrn(verifiableId, subjectId, lrnValue, lrnType);
         logger.info("Valor de jwtCredential: " + jwtCredential);
 
+
+
+
         model.addAttribute("jsonData", jwtCredential);
         model.addAttribute("typeJson", "LRN");
+
+
 
         return "muestraJws";
     }

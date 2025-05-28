@@ -4,55 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifiable Credential Viewer</title>
-    
     <link rel="stylesheet" href="./style_muestraJws.css">
-
-
-    <script>
-        
     
+    <script>
+        function showContent(type) {
+            const jsonData = document.getElementById('jsonData');
+            const decodedJson = document.getElementById('decodedJson');
+            const tabs = document.querySelectorAll('.tab');
 
-        //copiar json
+            if (type === 'json') {
+                jsonData.classList.add('active');
+                decodedJson.classList.remove('active');
+            } else {
+                jsonData.classList.remove('active');
+                decodedJson.classList.add('active');
+            }
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${type}"]`).classList.add('active');
+        }
+
         function copyToClipboard(containerId) {
             const text = document.querySelector(`#${containerId} pre`).textContent;
             navigator.clipboard.writeText(text).then(() => {
-                alert('JSON copied to clipboard!');
+                alert('Content copied to clipboard!');
             }).catch(err => {
                 console.error('Error copying text: ', err);
             });
         }
+
+        function decodeJWT(token) {
+            try {
+                const [headerB64, payloadB64] = token.split('.');
+                const decode = b64 => JSON.parse(atob(b64.replace(/-/g, '+').replace(/_/g, '/')));
+                return JSON.stringify({ header: decode(headerB64), payload: decode(payloadB64) }, null, 2);
+            } catch (e) {
+                console.error('Decoding error:', e);
+                return '{ "error": "Invalid token" }';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const jsonData = document.querySelector('#jsonData pre').textContent;
+            const decoded = decodeJWT(jsonData);
+            document.querySelector('#decodedJson pre').textContent = decoded;
+
+            showContent('decodedJson');  // Default to JSON view
+        });
     </script>
 </head>
 <body>
     <h1>Tu credencial verificable</h1>
 
     <div class="tab-container">
-        <div class="tab active" data-tab="jsonData" onclick="showJson('jsonData')">
-        <span th:if="${typeJson == 'LegalPerson'}">Credencial Legal Person</span>
-        <span th:if="${typeJson == 'TyC'}">Credencial Términos y Condiciones</span>
-        <span th:if="${typeJson == 'LRN'}">Numero de registro legal</span>
-    </div>
-        
+        <div class="tab active" data-tab="json" onclick="showContent('json')">JWT</div>
+        <div class="tab" data-tab="decodedJson" onclick="showContent('decodedJson')">JSON</div>
     </div>
 
-    <div id="jsonData" class="json-container active">
-        <button onclick="copyToClipboard('jsonData')">Copy JSON</button>
+    <div id="jsonData" class="content-container active">
+        <button onclick="copyToClipboard('jsonData')">Copiar</button>
         <pre th:text="${jsonData}"></pre>
     </div>
 
+    <div id="decodedJson" class="content-container">
+        <button onclick="copyToClipboard('decodedJson')">Copiar</button>
+        <pre></pre>
+    </div>
 
-    <form th:action="@{/}" method="GET" enctype="multipart/form-data">
-        <button class="inicio" type="submit">Crear Otra Credencial</button>
+    <form th:action="@{/}" method="GET">
+        <button class="inicio" type="submit">Crear otra credencial</button>
     </form>
 
-    <form th:action="@{/inicioSesion}" method="POST" enctype="multipart/form-data">
+    <form th:action="@{/inicioSesion}" method="POST">
         <button class="inicio" type="submit">Guardar credencial</button>
         <input type="hidden" id="typeJson" name="typeJson" th:value="${typeJson}" />
         <input type="hidden" id="jsonData" name="jsonData" th:value="${jsonData}" />
     </form>
-
-    
-
-
 </body>
 </html>

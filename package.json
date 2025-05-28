@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "jose": "^6.0.10"
+    "jose": "^6.0.10",
+    "jwt-decode": "^4.0.0"
   }
 }

@@ -1,56 +1,148 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Verificación de Credenciales</title>
-    <link rel="stylesheet" href="./style_muestraCredenciales.css">
-
-    <script>
-        // Copiar JSON al portapapeles
-        function copyToClipboard(containerId) {
-            const text = document.querySelector(`#${containerId} pre`).textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('¡JSON copiado al portapapeles!');
-            }).catch(err => {
-                console.error('Error al copiar el texto: ', err);
-            });
-        }
-    </script>
+    <link rel="stylesheet" href="./style_muestraCredenciales.css" />
 </head>
 <body>
     <h1>Credenciales Verificables</h1>
 
     <div class="tab-container">
-        <div class="tab active" data-tab="jsonData" th:if="${legalPerson != null}" onclick="showJson('jsonData')">
-            Credencial Legal Person
-        </div>
-        <div class="tab active" data-tab="jsonData" th:if="${terms != null}" onclick="showJson('jsonData')">
-            Credencial Términos y Condiciones
-        </div>
-        <div class="tab active" data-tab="jsonData" th:if="${lrn != null}" onclick="showJson('jsonData')">
-            Credencial Numero de registro legal
+        <div id="tab-jwt" class="tab" onclick="showContent('jwt')">JWT</div>
+        <div id="tab-json" class="tab active" onclick="showContent('json')">JSON</div>
+    </div>
+
+    <div id="jsonData" class="json-container active"
+         th:attr="data-legalperson=${legalPerson}, data-terms=${terms}, data-lrn=${lrn}">
+        <div>
+            <h3>Legal Person</h3>
+            <pre id="decodedLegalPerson"></pre>
+            <div class="button-container">
+                <button onclick="copyToClipboard('decodedLegalPerson')">Copiar</button>
+            </div>
+
+            <h3>Términos y Condiciones</h3>
+            <pre id="decodedTerms"></pre>
+            <div class="button-container">
+                <button onclick="copyToClipboard('decodedTerms')">Copiar</button>
+            </div>
+
+            <h3>Número de Registro Legal</h3>
+            <pre id="decodedLrn"></pre>
+            <div class="button-container">
+                <button onclick="copyToClipboard('decodedLrn')">Copiar</button>
+            </div>
         </div>
     </div>
 
-    <div id="jsonData" class="json-container active">
+    <div id="jwtData" class="json-container">
         <div th:if="${legalPerson != null}">
-            <h3>Credencial Legal Person</h3>
-            <pre th:text="${legalPerson}"></pre>
+            <h3>Legal Person</h3>
+            <pre id="jwtLegalPerson" th:text="${legalPerson}"></pre>
+            <div class="button-container">
+                <button onclick="copyToClipboard('jwtLegalPerson')">Copiar</button>
+            </div>
         </div>
+
         <div th:if="${terms != null}">
-            <h3>Credencial Términos y Condiciones</h3>
-            <pre th:text="${terms}"></pre>
+            <h3>Términos y Condiciones</h3>
+            <pre id="jwtTerms" th:text="${terms}"></pre>
+            <div class="button-container">
+                <button onclick="copyToClipboard('jwtTerms')">Copiar</button>
+            </div>
         </div>
+
         <div th:if="${lrn != null}">
-            <h3>Credencial Numero de registro legal</h3>
-            <pre th:text="${lrn}"></pre>
+            <h3>Número de Registro Legal</h3>
+            <pre id="jwtLrn" th:text="${lrn}"></pre>
+            <div class="button-container">
+                <button onclick="copyToClipboard('jwtLrn')">Copiar</button>
+            </div>
         </div>
     </div>
 
-    <!-- Botón para regresar a la página de inicio -->
-    <form th:action="@{/}" method="GET">
-        <button class="inicio" type="submit">Regresar al inicio</button>
-    </form>
+    <script>
+        function showContent(type) {
+            const jsonData = document.getElementById('jsonData');
+            const jwtData = document.getElementById('jwtData');
+            const tabs = document.getElementsByClassName('tab');
+
+            if (type === 'json') {
+                jsonData.classList.add('active');
+                jwtData.classList.remove('active');
+            } else {
+                jsonData.classList.remove('active');
+                jwtData.classList.add('active');
+            }
+
+            [...tabs].forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-' + type).classList.add('active');
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            
+            if (!text) {
+                console.warn('No hay contenido para copiar.');
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Contenido copiado al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+            });
+        }
+
+        function decodeJWT(token) {
+            try {
+                const [headerB64, payloadB64] = token.split('.');
+                const decode = b64 => JSON.parse(atob(b64.replace(/-/g, '+').replace(/_/g, '/')));
+                return {
+                    header: decode(headerB64),
+                    payload: decode(payloadB64)
+                };
+            } catch (e) {
+                console.log("Decoding error: ", e);
+                return { error: "Token no válido" };
+            }
+        }
+
+        const jsonDataDiv = document.getElementById('jsonData');
+        const legalPersonJWT = jsonDataDiv.dataset.legalperson;
+        const termsJWT = jsonDataDiv.dataset.terms;
+        const lrnJWT = jsonDataDiv.dataset.lrn;
+
+        console.log("Dataset legalPerson:", legalPersonJWT);
+        console.log("Dataset terms:", termsJWT);
+        console.log("Dataset lrn:", lrnJWT);
+
+        if (legalPersonJWT && legalPersonJWT !== 'null') {
+            const decoded = decodeJWT(removeCurlyBraces(legalPersonJWT));
+            const jsonString = JSON.stringify(decoded, null, 2);
+            document.getElementById('decodedLegalPerson').textContent = jsonString;
+        }
+
+        if (termsJWT && termsJWT !== 'null') {
+            const decoded = decodeJWT(removeCurlyBraces(termsJWT));
+            const jsonString = JSON.stringify(decoded, null, 2);
+            document.getElementById('decodedTerms').textContent = jsonString;
+        }
+
+        if (lrnJWT && lrnJWT !== 'null') {
+            const decoded = decodeJWT(removeCurlyBraces(lrnJWT));
+            const jsonString = JSON.stringify(decoded, null, 2);
+            document.getElementById('decodedLrn').textContent = jsonString;
+        }
+
+        function removeCurlyBraces(jsonString) {
+            if (jsonString.startsWith('{') && jsonString.endsWith('}')) {
+                return jsonString.slice(1, -1).trim();
+            }
+            return jsonString;
+        }
+    </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-package es.arlabdevelopments.firmador;
+package es.arlabdevelopments.firmador.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +38,7 @@ class ControllerDB {
 
 
 
-/////////////////////////////  Inicio de sesion ///////////////////////////////////////////
+////////////////////////////////  Inicio de sesion  ////////////////////////////////////////////////
     @PostMapping("/inicioSesion")
         public String handleInitDB(@RequestParam("typeJson") String typeJson,
                     @RequestParam("jsonData") String jsonData,
