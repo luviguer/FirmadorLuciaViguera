@@ -2,21 +2,19 @@ form {
     margin-bottom: 20px; 
 }
 
+/* Eliminamos el centrado general del body */
 body {
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     background-color: #f5f7fb; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-
+/* Contenedor principal ahora centrado horizontalmente, con margen superior */
 .container {
     width: 100%;
     max-width: 500px;
+    margin: 40px auto;
     padding: 40px;
     background-color: #ffffff; 
     border-radius: 12px;
@@ -24,14 +22,12 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
 }
 
-
 h1 {
     color: #333333; 
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 20px;
 }
-
 
 .general-button {
     background-color: #6366f1; 
@@ -61,9 +57,6 @@ h1 {
     transform: translateY(1px); 
 }
 
-
-
-
 .section {
     margin-top: 30px;
     padding-top: 10px;
@@ -77,9 +70,59 @@ h2 {
     font-weight: 600;
 }
 
+.top-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra contenido horizontalmente */
+    background-color: #eef2ff;
+    padding: 20px 30px;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.1);
+    border-bottom: 2px solid #6366f1;
+    border-radius: 0 0 12px 12px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto; /* Centra horizontalmente la barra en pantallas grandes */
+}
 
 
+.app-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #4f46e5;
+    text-align: center;
+    grid-column: 2; /* ocupa el centro */
+}
 
+.access-links {
+    display: flex;
+    flex-wrap: wrap; /* permite que bajen de línea si no caben */
+    gap: 10px;        /* espacio uniforme entre botones */
+    justify-content: center; /* centra horizontalmente */
+}
 
+.access-link {
+    background-color: transparent;
+    color: #4f46e5;
+    border: 2px solid #4f46e5;
+    border-radius: 6px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
 
-
+.access-link:hover {
+    background-color: #4f46e5;
+    color: white;
+}
+.alert-message {
+    background-color: #e0ffe0;
+    color: #2d7a2d;
+    border: 1px solid #b5e6b5;
+    padding: 10px 20px;
+    margin: 20px auto;
+    width: fit-content;
+    border-radius: 8px;
+    font-weight: bold;
+}

@@ -7,9 +7,26 @@
     <link rel="stylesheet" href="style_menuPrincipal.css">
 </head>
 <body>
-    <div class="container">
-        <h1>FIRMADOR</h1>
+    <header class="top-bar">
+        <h1 class="app-title">FIRMADOR</h1>
+        <div class="access-links">
+            <form th:action="@{/auth}" method="GET">
+                <button type="submit" class="access-link">Registrarse</button>
+            </form>
+            <form th:action="@{/login}" method="GET">
+                <button type="submit" class="access-link">Iniciar sesión</button>
+            </form>
+            <form th:action="@{/logout}" method="GET">
+                <button type="submit" class="access-link">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
 
+    <div th:if="${mensaje}" class="alert-message">
+        <p th:text="${mensaje}"></p>
+    </div>
+
+    <div class="container">
         <div class="section">
             <h2>Credenciales</h2>
             <form th:action="@{/startLegalPerson}" method="GET">
@@ -19,21 +36,20 @@
                 <button type="submit" class="general-button">Términos y Condiciones</button>
             </form>
             <form th:action="@{/startLRN}" method="GET">
-                <button type="submit" class="general-button">Numero de registro legal</button>
+                <button type="submit" class="general-button">Número de Registro Legal</button>
             </form>
         </div>
 
         <div class="section">
-            <h2>Presentacion</h2>
+            <h2>Presentación</h2>
             <form th:action="@{/startRequisitos}" method="GET">
                 <button type="submit" class="general-button">Presentación Verificable</button>
             </form>
         </div>
 
-
         <div class="section">
             <h2>Tus Credenciales</h2>
-            <form th:action="@{/login}" method="GET">
+            <form th:action="@{/verCredenciales}" method="GET">
                 <button type="submit" class="general-button">Ver Credenciales</button>
             </form>
         </div>

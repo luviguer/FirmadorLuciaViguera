@@ -9,60 +9,73 @@
 <body>
     <h1>Credenciales Verificables</h1>
 
-    <div class="tab-container">
-        <div id="tab-jwt" class="tab" onclick="showContent('jwt')">JWT</div>
-        <div id="tab-json" class="tab active" onclick="showContent('json')">JSON</div>
+    <div th:if="${sinCredenciales}" class="mensaje-sin-credenciales">
+    <h2>Todavía no tienes credenciales guardadas.</h2>
+    <form th:action="@{/}" method="GET">
+        <button type="submit">Volver al Menú Principal</button>
+    </form>
     </div>
+    <div th:if="${!sinCredenciales}">
+        <div class="tab-container">
+            <div id="tab-jwt" class="tab" onclick="showContent('jwt')">JWT</div>
+            <div id="tab-json" class="tab active" onclick="showContent('json')">JSON</div>
+        </div>
 
-    <div id="jsonData" class="json-container active"
-         th:attr="data-legalperson=${legalPerson}, data-terms=${terms}, data-lrn=${lrn}">
-        <div>
-            <h3>Legal Person</h3>
-            <pre id="decodedLegalPerson"></pre>
-            <div class="button-container">
-                <button onclick="copyToClipboard('decodedLegalPerson')">Copiar</button>
+        <div id="jsonData" class="json-container active"
+            th:attr="data-legalperson=${legalPerson}, data-terms=${terms}, data-lrn=${lrn}">
+            <div>
+                <div th:if="${legalPerson != null}">
+                    <h3>Legal Person</h3>
+                    <pre id="decodedLegalPerson"></pre>
+                    <div class="button-container">
+                        <button onclick="copyToClipboard('decodedLegalPerson')">Copiar</button>
+                    </div>
+                </div>
+
+                <div th:if="${terms != null}">
+                    <h3>Términos y Condiciones</h3>
+                    <pre id="decodedTerms"></pre>
+                    <div class="button-container">
+                        <button onclick="copyToClipboard('decodedTerms')">Copiar</button>
+                    </div>
+                </div>
+
+              <div th:if="${lrn != null}">
+                <h3>Número de Registro Legal</h3>
+                <pre id="decodedLrn"></pre>
+                <div class="button-container">
+                    <button onclick="copyToClipboard('decodedLrn')">Copiar</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div id="jwtData" class="json-container">
+            <div th:if="${legalPerson != null}">
+                <h3>Legal Person</h3>
+                <pre id="jwtLegalPerson" th:text="${legalPerson}"></pre>
+                <div class="button-container">
+                    <button onclick="copyToClipboard('jwtLegalPerson')">Copiar</button>
+                </div>
             </div>
 
-            <h3>Términos y Condiciones</h3>
-            <pre id="decodedTerms"></pre>
-            <div class="button-container">
-                <button onclick="copyToClipboard('decodedTerms')">Copiar</button>
+            <div th:if="${terms != null}">
+                <h3>Términos y Condiciones</h3>
+                <pre id="jwtTerms" th:text="${terms}"></pre>
+                <div class="button-container">
+                    <button onclick="copyToClipboard('jwtTerms')">Copiar</button>
+                </div>
             </div>
 
-            <h3>Número de Registro Legal</h3>
-            <pre id="decodedLrn"></pre>
-            <div class="button-container">
-                <button onclick="copyToClipboard('decodedLrn')">Copiar</button>
+            <div th:if="${lrn != null}">
+                <h3>Número de Registro Legal</h3>
+                <pre id="jwtLrn" th:text="${lrn}"></pre>
+                <div class="button-container">
+                    <button onclick="copyToClipboard('jwtLrn')">Copiar</button>
+                </div>
             </div>
         </div>
     </div>
-
-    <div id="jwtData" class="json-container">
-        <div th:if="${legalPerson != null}">
-            <h3>Legal Person</h3>
-            <pre id="jwtLegalPerson" th:text="${legalPerson}"></pre>
-            <div class="button-container">
-                <button onclick="copyToClipboard('jwtLegalPerson')">Copiar</button>
-            </div>
-        </div>
-
-        <div th:if="${terms != null}">
-            <h3>Términos y Condiciones</h3>
-            <pre id="jwtTerms" th:text="${terms}"></pre>
-            <div class="button-container">
-                <button onclick="copyToClipboard('jwtTerms')">Copiar</button>
-            </div>
-        </div>
-
-        <div th:if="${lrn != null}">
-            <h3>Número de Registro Legal</h3>
-            <pre id="jwtLrn" th:text="${lrn}"></pre>
-            <div class="button-container">
-                <button onclick="copyToClipboard('jwtLrn')">Copiar</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         function showContent(type) {
             const jsonData = document.getElementById('jsonData');

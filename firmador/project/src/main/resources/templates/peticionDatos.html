@@ -21,6 +21,8 @@
     </script>
 </head>
 <body>
+    <div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
     
         <div class="container">
             <form action="#" th:action="@{/upload}" method="POST" enctype="multipart/form-data" onsubmit="saveHiddenFieldsToLocalStorage()">
@@ -49,7 +51,7 @@
                 <input type="hidden" id="jsonGenerado" name="jsonGenerado" th:value="${jsonGenerado}" />
                
 
-                <button type="submit">Crear JWS</button>
+                <button type="submit">Siguiente</button>
             </form>
         </div>
     </div>

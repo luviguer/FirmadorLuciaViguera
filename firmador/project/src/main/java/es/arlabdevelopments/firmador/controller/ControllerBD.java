@@ -36,24 +36,27 @@ class ControllerDB {
 
 
 
-
-
 ////////////////////////////////  Inicio de sesion  ////////////////////////////////////////////////
-    @PostMapping("/inicioSesion")
-        public String handleInitDB(@RequestParam("typeJson") String typeJson,
-                    @RequestParam("jsonData") String jsonData,
-                    HttpSession session,
-                    Model model) {
+    @GetMapping("/inicioSesion")
+        public String handleInitDB() {
 
-          
-
-            //guardar en sesion
-            session.setAttribute("jsonData", jsonData);
-            session.setAttribute("typeJson", typeJson);
-
+        
             return "inicioSesion";
             
     }
+
+
+////////////////////////////////  Inicio de sesion  ////////////////////////////////////////////////
+    @GetMapping("/logout")
+        public String handleInitlogout(HttpSession session, Model model) {
+
+
+            session.setAttribute("usuario", null); 
+            model.addAttribute("mensaje", "Sesión cerrada correctamente.");     
+            return "menuPrincipal";
+            
+    }
+
 
 
 /////////////////////////////  Auth ///////////////////////////////////////////
@@ -100,19 +103,27 @@ class ControllerDB {
         String typeJson = (String) session.getAttribute("typeJson");
         logger.info("Los datos de sesion:" + jsonData + "," +typeJson);
 
+        //guardo al usuario en sesion
+        session.setAttribute("usuario", nuevoUsuario); 
+
+                    // Caso 1: guardar credenciales
+
+        if (typeJson != null && jsonData != null) {
 
 
-        try {
-            credencialService.guardarCredencial(nuevoUsuario, typeJson, jsonData);
-            logger.info("Credencial guardada correctamente para el nuevo usuario " + dni);
-            session.setAttribute("jsonData", null);
-            session.setAttribute("typeJson", null);
+                return "redirect:/guardarCredencial";
 
-        } catch (RuntimeException e) {
-            logger.warning("Error al guardar la credencial: " + e.getMessage());
-            model.addAttribute("error", "Error al guardar la credencial.");
-            return "auth";
-        }
+        } else if("verCredenical".equals(session.getAttribute("vista"))){
+
+                        session.setAttribute("vista",null); 
+                        return "redirect:/verCredenciales";
+
+        } else if(!"verCredenical".equals(session.getAttribute("vista"))){
+                        
+            session.setAttribute("vista",null); 
+            model.addAttribute("mensaje", "Registro exitoso.");
+             return "menuPrincipal";
+            }
 
         return "cargandoCredencial";
     }
@@ -139,63 +150,155 @@ class ControllerDB {
 
                 var usuarioOpt = usuarioService.autenticar(dni, password);
                 String jsonData = (String) session.getAttribute("jsonData");
-                String typeJson = (String) session.getAttribute("typeJson"); // Usamos esto para decidir el flujo
+                String typeJson = (String) session.getAttribute("typeJson"); 
 
                 logger.info("Datos de sesión: jsonData=" + jsonData + ", typeJson=" + typeJson);
 
                 if (usuarioOpt.isPresent()) {
-                    Usuario usuario = usuarioOpt.get();
+
                     logger.info("Login exitoso para el DNI: " + dni);
+                    Usuario usuario = usuarioOpt.get();
+
+                    //guardo al usuario en sesion
+                    session.setAttribute("usuario", usuario); 
+
+                    // Caso 1: guardar credenciales
 
                     if (typeJson != null && jsonData != null) {
-                        //  Caso 1: crear credencial
-                        try {
-                            credencialService.guardarCredencial(usuario, typeJson, jsonData);
-                            logger.info("Credencial guardada correctamente para el usuario " + dni);
-                            session.setAttribute("jsonData", null);
-                            session.setAttribute("typeJson", null);
-
-                            return "cargandoCredencial";
-                        } catch (RuntimeException e) {
-                            logger.info("Error al guardar la credencial: " + e.getMessage());
-                            model.addAttribute("error", "Error al guardar la credencial.");
-                            return "login";
-                        }
-                    } else {
-                        // Caso 2: ver credenciales
-                        List<Credencial> credenciales = credencialService.obtenerCredencialesPorUsuario(usuario);
-                        String legalPerson = null;
-                        String terms = null;
-                        String lrn = null;
-
-                        for (Credencial c : credenciales) {
-                            System.out.println("Encontrada credencial tipo: " + c.getTipo().name());
-
-                            if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
-                                legalPerson = c.getContenidoJson();
-                                System.out.println("Asignada a legalPerson");
-                            } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
-                                terms = c.getContenidoJson();
-                                System.out.println("Asignada a terms");
-                            } else if (c.getTipo().name().equalsIgnoreCase("LRN")) {
-                                lrn = c.getContenidoJson();
-                                System.out.println("Asignada a lrn");
-                            }
-                        }
 
 
-                        model.addAttribute("legalPerson", legalPerson);
-                        model.addAttribute("terms", terms);
-                        model.addAttribute("lrn", lrn);
-                        return "muestraCredenciales";
-                    }
+                        return "redirect:/guardarCredencial";
+
+                    } else if("verCredenical".equals(session.getAttribute("vista"))){
+
+                        session.setAttribute("vista",null); 
+                        return "redirect:/verCredenciales";
+
+                    } else if(!"verCredenical".equals(session.getAttribute("vista"))){
+                        
+                        session.setAttribute("vista",null);
+                        model.addAttribute("mensaje", "Inicio de sesión exitosa.");
+                        return "menuPrincipal";
+
+        }
 
                 } else {
                     logger.info("No se ha encontrado el usuario: " + dni);
                     model.addAttribute("error", "DNI o contraseña incorrectos.");
                     return "login";
+        }
+        return "login";
+ }
+
+
+
+
+///////////////////////////// GUARADR CREDENCIAL ////////////////////////////////////////////
+
+
+    @PostMapping("/guardarCredencial")
+        public String guardarCredencial(HttpSession session, Model model,@RequestParam("typeJson") String typeJson,
+                    @RequestParam("jsonData") String jsonData) {
+
+             
+            session.setAttribute("jsonData", jsonData);
+            session.setAttribute("typeJson", typeJson);
+            
+        return "redirect:/guardarCredencial";            
+    }
+
+
+
+
+    @GetMapping("/guardarCredencial")
+    public String guardarCredencial(HttpSession session, Model model) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        //compruebo si el usuario esta en sesion
+        if (usuario == null) {
+            return "redirect:/inicioSesion";
+        }
+
+       String jsonData = (String) session.getAttribute("jsonData");
+       String typeJson = (String) session.getAttribute("typeJson"); 
+
+        logger.info("Datos de sesión: jsonData=" + jsonData + ", typeJson=" + typeJson);
+
+
+            try {
+                credencialService.guardarCredencial(usuario, typeJson, jsonData);
+                session.setAttribute("jsonData", null);
+                session.setAttribute("typeJson", null);
+
+                return "cargandoCredencial";
+
+            } catch (RuntimeException e) {
+                logger.info("Error al guardar la credencial: " + e.getMessage());
+                model.addAttribute("error", "Error al guardar la credencial.");
+                return "login";
+            }
+        
+    }
+
+
+//////////////////////////   VER CREDENCIALES  /////////////////////////////////////////////
+    @GetMapping("/verCredenciales")
+    public String verCredenciales(HttpSession session, Model model) {
+
+            // Obtener el usuario de la sesión
+            Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+            
+
+            //compruebo si el usuario esta en sesion
+
+            if (usuario == null) {
+
+                //cambiar el tipo para redirigir posteriormente
+                session.setAttribute("vista","verCredenical");
+                return "redirect:/inicioSesion";
+            }
+
+          
+
+            // Obtener las credenciales del servicio
+            List<Credencial> credenciales = credencialService.obtenerCredencialesPorUsuario(usuario);
+            
+            // bool para saber si no hay ninguna credencial
+            boolean sinCredenciales = credenciales == null || credenciales.isEmpty();
+
+            String legalPerson = null;
+            String terms = null;
+            String lrn = null;
+
+            for (Credencial c : credenciales) {
+                System.out.println("Encontrada credencial tipo: " + c.getTipo().name());
+
+                if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
+                    legalPerson = c.getContenidoJson();
+                    System.out.println("Asignada a legalPerson");
+                } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
+                    terms = c.getContenidoJson();
+                    System.out.println("Asignada a terms");
+                } else if (c.getTipo().name().equalsIgnoreCase("LRN")) {
+                    lrn = c.getContenidoJson();
+                    System.out.println("Asignada a lrn");
                 }
             }
+
+            // Pasar datos al modelo para mostrarlos en la vista
+            model.addAttribute("legalPerson", legalPerson);
+            model.addAttribute("terms", terms);
+            model.addAttribute("lrn", lrn);
+            model.addAttribute("sinCredenciales", sinCredenciales);
+
+
+            return "muestraCredenciales";
+        }
+
+
+
 
 
 
@@ -253,7 +356,7 @@ class ControllerDB {
         }
 
         if (lrn != null) {
-            session.setAttribute("credencial_lrn", terms);
+            session.setAttribute("credencial_lrn", lrn);
             count++;
         }
 

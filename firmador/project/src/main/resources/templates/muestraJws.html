@@ -75,7 +75,7 @@
         <button class="inicio" type="submit">Crear otra credencial</button>
     </form>
 
-    <form th:action="@{/inicioSesion}" method="POST">
+    <form th:action="@{/guardarCredencial}" method="POST">
         <button class="inicio" type="submit">Guardar credencial</button>
         <input type="hidden" id="typeJson" name="typeJson" th:value="${typeJson}" />
         <input type="hidden" id="jsonData" name="jsonData" th:value="${jsonData}" />

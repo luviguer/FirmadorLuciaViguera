@@ -170,12 +170,18 @@ class ControllerFirmador {
 
             
             if (file.isEmpty()) {
-                logger.info("El archivo no se ha subido correctamente.");     
+                logger.info("El archivo no se ha subido correctamente."); 
+                model.addAttribute("error", "El archivo no se ha subido correctamente.");
+                return "peticionDatos";
                 
             }
 
             File f = faux.creaFichero(file);  
             ArrayList<String> aliasArray=Libreria.comprobarAlias(f);
+             if (aliasArray.isEmpty()) {
+                model.addAttribute("error", "No se encontró ningún alias en el fichero.");
+                return "peticionDatos";
+            }
             String alias= aliasArray.get(0);
             logger.info("Nombre del fichero: " + f.getName());
             logger.info("Valor del alias: " + alias);
@@ -185,6 +191,11 @@ class ControllerFirmador {
         
               
             Key clavePrivada = Libreria.clave(alias, contrasena, f);
+            if (clavePrivada == null) {
+                model.addAttribute("error", "No se pudo obtener la clave privada. Revisa el alias o la contraseña.");
+                return "peticionDatos";
+        }
+
         
     
             // Convertir clave a formato PEM
