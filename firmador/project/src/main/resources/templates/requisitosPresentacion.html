@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Requisitos para Presentación Verificable</title>
   <link rel="stylesheet" href="style_requisitos.css">
-
-  
 </head>
 <body>
   <div class="container">
@@ -16,21 +14,30 @@
       Para poder generar una presentación verificable, necesitás cumplir con los siguientes requisitos:
     </p>
 
-    <div class="requirement">
-      ✅ Tener la credencial verificable de <strong>Legal Person</strong>.
-    </div>
-    <div class="requirement">
-      ✅ Tener la credencial verificable de <strong>Términos y Condiciones</strong>.
-    </div>
-    <div class="requirement">
-      ✅ Tener un <strong>Número de Registro Legal</strong> (LRN).
+    <div class="requirement-row">
+      <div class="requirement">
+        ✅ Tener la credencial verificable de <strong>Persona Legal</strong>.
+      </div>
+      <a href="/startLegalPerson" class="btn-small">Crear</a>
     </div>
 
-    <div class="buttons">
-      <a href="/startLegalPerson" class="btn">Crear Legal Person</a>
-      <a href="/startTerminosCondiciones" class="btn">Crear Términos y Condiciones</a>
+    <div class="requirement-row">
+      <div class="requirement">
+        ✅ Tener la credencial verificable de <strong>Términos y Condiciones</strong>.
+      </div>
+      <a href="/startTerminosCondiciones" class="btn-small">Crear</a>
+    </div>
+
+    <div class="requirement-row">
+      <div class="requirement">
+        ✅ Tener un <strong>Número de Registro Legal</strong> (LRN).
+      </div>
+      <a href="/startLRN" class="btn-small">Crear</a>
+    </div>
+
+    <div class="final-buttons">
       <a href="/startPresentacionVerificable" class="btn">Continuar</a>
-
+      <a href="/" class="btn">Volver al inicio</a>
     </div>
   </div>
 </body>

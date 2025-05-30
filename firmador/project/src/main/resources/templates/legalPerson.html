@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,28 +7,27 @@
     <link rel="stylesheet" href="style_legalPerson.css">
 </head>
 <body>
-    <h2>LegalPerson</h2>
+    <h2>Persona Legal</h2>
     <form th:action="@{/startLegalPerson}" method="POST" enctype="multipart/form-data">
-        <label for="verifiableId" class="bold-label">Verifiable Credential ID</label>
+        <label for="verifiableId" class="bold-label">ID Credencial Verificable</label>
         <input type="text" id="verifiableId" name="verifiableId" required>
 
         <fieldset>
-            <legend>Headquarters Address</legend>
+            <legend>Dirección de la Sede</legend>
             <div class="country-group">
                 <div>
-                    <label for="hqCountryCode">Country Code</label>
+                    <label for="hqCountryCode">Código del País</label>
                     <input type="text" id="hqCountryCode" name="hqCountryCode" required>
                 </div>
                 <div>
-                    <label for="hqCountryName">Country Name</label>
+                    <label for="hqCountryName">Nombre del País</label>
                     <input type="text" id="hqCountryName" name="hqCountryName" required>
                     <input type="hidden" id="typeJson" name="typeJson" value="LegalPerson">
-
                 </div>
             </div>
         </fieldset>
 
-        <label for="lrnValue" class="bold-label">Legal Registration Number (LRN) *</label>
+        <label for="lrnValue" class="bold-label">Número de Registro Legal (LRN) *</label>
         <select id="lrnValue" name="lrnValue" required>
             <option value="EORI">EORI</option>
             <option value="VAT_ID">VAT ID</option>
@@ -37,20 +36,23 @@
         <input type="text" id="lrn" name="lrn" required>
 
         <fieldset>
-            <legend>Legal Address</legend>
+            <legend>Dirección Legal</legend>
             <div class="country-group">
                 <div>
-                    <label for="legalCountryCode">Country Code</label>
+                    <label for="legalCountryCode">Código del País</label>
                     <input type="text" id="legalCountryCode" name="legalCountryCode" required>
                 </div>
                 <div>
-                    <label for="legalCountryName">Country Name</label>
+                    <label for="legalCountryName">Nombre del País</label>
                     <input type="text" id="legalCountryName" name="legalCountryName" required>
                 </div>
             </div>
         </fieldset>
 
         <button type="submit">Siguiente</button>
+        <button type="button" onclick="window.location.href='/'">Cancelar operación</button>
+
     </form>
+
 </body>
 </html>

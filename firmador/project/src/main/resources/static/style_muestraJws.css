@@ -102,3 +102,26 @@
         .inicio:hover {
             background-color: #4f46e5; 
         }
+
+        .mensaje-sin-credenciales {
+    text-align: center;
+    margin-top: 60px;
+    background-color: #fef3c7;
+    padding: 20px;
+    border: 1px solid #facc15;
+    border-radius: 12px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mensaje-sin-credenciales button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+}

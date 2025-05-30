@@ -124,3 +124,27 @@ pre {
     cursor: pointer;
     font-size: 1rem;
 }
+
+.boton-inicio {
+    background-color: #6366f1;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.boton-inicio:hover {
+    background-color: #4f46e5;
+}
+
+.boton-inicio:active {
+    background-color: #4338ca;
+}
+

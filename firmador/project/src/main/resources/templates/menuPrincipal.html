@@ -9,17 +9,22 @@
 <body>
     <header class="top-bar">
         <h1 class="app-title">FIRMADOR</h1>
-        <div class="access-links">
-            <form th:action="@{/auth}" method="GET">
-                <button type="submit" class="access-link">Registrarse</button>
-            </form>
-            <form th:action="@{/login}" method="GET">
-                <button type="submit" class="access-link">Iniciar sesión</button>
-            </form>
-            <form th:action="@{/logout}" method="GET">
-                <button type="submit" class="access-link">Cerrar sesión</button>
-            </form>
-        </div>
+       <div class="access-links">
+    <div class="left-links" th:if="${session.usuario == null}">
+        <form th:action="@{/auth}" method="GET" style="display: inline;">
+            <button type="submit" class="access-link">Registrarse</button>
+        </form>
+        <form th:action="@{/login}" method="GET" style="display: inline; margin-left: 10px;">
+            <button type="submit" class="access-link">Iniciar sesión</button>
+        </form>
+    </div>
+
+    <div class="right-links" th:if="${session.usuario != null}">
+        <form th:action="@{/logout}" method="GET" style="display: inline;">
+            <button type="submit" class="access-link">Cerrar sesión</button>
+        </form>
+    </div>
+</div>
     </header>
 
     <div th:if="${mensaje}" class="alert-message">
@@ -30,7 +35,7 @@
         <div class="section">
             <h2>Credenciales</h2>
             <form th:action="@{/startLegalPerson}" method="GET">
-                <button type="submit" class="general-button">LegalPerson</button>
+                <button type="submit" class="general-button">Persona Legal</button>
             </form>
             <form th:action="@{/startTerminosCondiciones}" method="GET">
                 <button type="submit" class="general-button">Términos y Condiciones</button>

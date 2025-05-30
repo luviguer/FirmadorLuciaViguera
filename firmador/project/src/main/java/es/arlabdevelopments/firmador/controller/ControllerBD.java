@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import es.arlabdevelopments.firmador.model.Credencial;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 
 import java.util.logging.Logger;
@@ -48,12 +51,12 @@ class ControllerDB {
 
 ////////////////////////////////  Inicio de sesion  ////////////////////////////////////////////////
     @GetMapping("/logout")
-        public String handleInitlogout(HttpSession session, Model model) {
+        public String handleInitlogout(HttpSession session, Model model,RedirectAttributes redirectAttributes) {
 
 
             session.setAttribute("usuario", null); 
-            model.addAttribute("mensaje", "Sesión cerrada correctamente.");     
-            return "menuPrincipal";
+            redirectAttributes.addFlashAttribute("mensaje", "Sesión cerrada correctamente.");     
+            return "redirect:/";
             
     }
 
@@ -72,7 +75,7 @@ class ControllerDB {
                             @RequestParam("password") String password,
                             @RequestParam("confirmPassword") String confirmPassword,
                             HttpSession session,
-                            Model model) {
+                            Model model,RedirectAttributes redirectAttributes) {
 
         logger.info("Datos recibidos en /auth:");
         logger.info("DNI: " + dni);
@@ -121,8 +124,8 @@ class ControllerDB {
         } else if(!"verCredenical".equals(session.getAttribute("vista"))){
                         
             session.setAttribute("vista",null); 
-            model.addAttribute("mensaje", "Registro exitoso.");
-             return "menuPrincipal";
+            redirectAttributes.addFlashAttribute("mensaje", "Registro exitoso.");
+             return "redirect:/";
             }
 
         return "cargandoCredencial";
@@ -146,7 +149,7 @@ class ControllerDB {
              public String handleLoginSubmit(@RequestParam String dni,
                                     @RequestParam String password,
                                     HttpSession session,
-                                    Model model) {
+                                    Model model,RedirectAttributes redirectAttributes) {
 
                 var usuarioOpt = usuarioService.autenticar(dni, password);
                 String jsonData = (String) session.getAttribute("jsonData");
@@ -177,8 +180,8 @@ class ControllerDB {
                     } else if(!"verCredenical".equals(session.getAttribute("vista"))){
                         
                         session.setAttribute("vista",null);
-                        model.addAttribute("mensaje", "Inicio de sesión exitosa.");
-                        return "menuPrincipal";
+                        redirectAttributes.addFlashAttribute("mensaje", "Inicio de sesión exitosa.");
+                        return "redirect:/";
 
         }
 
@@ -235,7 +238,7 @@ class ControllerDB {
 
             } catch (RuntimeException e) {
                 logger.info("Error al guardar la credencial: " + e.getMessage());
-                model.addAttribute("error", "Error al guardar la credencial.");
+                model.addAttribute("error", "Error al guardar la credencial, ya la tienes guardada.");
                 return "login";
             }
         
@@ -316,7 +319,7 @@ class ControllerDB {
                                     HttpSession session,
                                     Model model) {
 
-        var usuarioOpt = usuarioService.autenticar(dni, password);
+         var usuarioOpt = usuarioService.autenticar(dni, password);
 
         if (usuarioOpt.isEmpty()) {
             model.addAttribute("error", "DNI o contraseña incorrectos.");
@@ -331,43 +334,46 @@ class ControllerDB {
         String lrn = null;
 
         for (Credencial c : credenciales) {
-             System.out.println("Encontrada credencial tipo: " + c.getTipo().name());
+            System.out.println("Encontrada credencial tipo: " + c.getTipo().name());
 
-                if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
-                        legalPerson = c.getContenidoJson();
-                        System.out.println("Asignada a legalPerson");
-                } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
-                        terms = c.getContenidoJson();
-                        System.out.println("Asignada a terms");
-                        } else if (c.getTipo().name().equalsIgnoreCase("LRN")) {
-                        lrn = c.getContenidoJson();
-                        System.out.println("Asignada a lrn");
-                        }
-                }
+            if (c.getTipo().name().equalsIgnoreCase("LegalPerson")) {
+                legalPerson = c.getContenidoJson();
+                System.out.println("Asignada a legalPerson");
+            } else if (c.getTipo().name().equalsIgnoreCase("TyC")) {
+                terms = c.getContenidoJson();
+                System.out.println("Asignada a terms");
+            } else if (c.getTipo().name().equalsIgnoreCase("LRN")) {
+                lrn = c.getContenidoJson();
+                System.out.println("Asignada a lrn");
+            }
+        }
 
-        int count = 0;
+        // Lista para llevar seguimiento de faltantes
+        List<String> faltantes = new ArrayList<>();
+
         if (legalPerson != null) {
             session.setAttribute("credencial_legalPerson", legalPerson);
-            count++;
+        } else {
+            faltantes.add("LegalPerson");
         }
+
         if (terms != null) {
             session.setAttribute("credencial_terms", terms);
-            count++;
+        } else {
+            faltantes.add("Términos y Condiciones");
         }
 
         if (lrn != null) {
             session.setAttribute("credencial_lrn", lrn);
-            count++;
+        } else {
+            faltantes.add("Número de Registro Legal");
         }
 
-        if (count == 3) {
+        if (faltantes.isEmpty()) {
             model.addAttribute("mensaje", "Credenciales encontradas, listo para continuar");
-        } else if (count == 2) {
-            model.addAttribute("error", "Faltan una de las credenciales.");
-        } else if (count == 2) {
-            model.addAttribute("error", "Faltan dos de las credenciales.");
-        }else{
-            model.addAttribute("error", "Faltan todas las credenciales.");
+        } else {
+            String mensajeError = "Faltan las siguientes credenciales: " + String.join(", ", faltantes) + ".";
+            model.addAttribute("error", mensajeError);
         }
 
         return "presentacionVerificable";

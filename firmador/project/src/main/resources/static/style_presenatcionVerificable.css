@@ -116,3 +116,25 @@
   font-weight: bold;
   margin-top: 10px;
 }
+button {
+    background-color: #6366f1;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #4f46e5;
+}
+
+button:active {
+    background-color: #4338ca;
+}

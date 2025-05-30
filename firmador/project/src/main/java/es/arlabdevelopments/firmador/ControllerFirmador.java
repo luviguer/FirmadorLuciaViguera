@@ -23,11 +23,16 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
 import java.util.ArrayList;
+import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList; 
 
-
+import es.arlabdevelopments.firmador.model.Usuario;
+import es.arlabdevelopments.firmador.model.Credencial;
+import es.arlabdevelopments.firmador.service.CredencialService;
 import es.arlabdevelopments.firmador.Libreria;
 import java.security.Key;
-
+import java.util.List;
+import java.util.List;
 
 import java.util.logging.Logger;
 
@@ -39,6 +44,9 @@ class ControllerFirmador {
 
     @Autowired
     private FuncionesAuxiliares faux;
+
+    @Autowired
+    private CredencialService credencialService;
 
 
 /////////////////////////////  MENU PRINCIPAL ///////////////////////////////////////////
@@ -150,8 +158,47 @@ class ControllerFirmador {
 
 
     @GetMapping("/startPresentacionVerificable")
-    public String handleGetStartPresentacionVerificable() {
+    public String handleGetStartPresentacionVerificable(HttpSession session, Model model) {
 
+          Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario != null) {
+            // Ya hay sesión iniciada: buscar credenciales automáticamente
+            List<Credencial> credenciales = credencialService.obtenerCredencialesPorUsuario(usuario);
+
+            String legalPerson = null;
+            String terms = null;
+            String lrn = null;
+
+            for (Credencial c : credenciales) {
+                switch (c.getTipo().name().toLowerCase()) {
+                    case "legalperson":
+                        legalPerson = c.getContenidoJson();
+                        session.setAttribute("credencial_legalPerson", legalPerson);
+                        break;
+                    case "tyc":
+                        terms = c.getContenidoJson();
+                        session.setAttribute("credencial_terms", terms);
+                        break;
+                    case "lrn":
+                        lrn = c.getContenidoJson();
+                        session.setAttribute("credencial_lrn", lrn);
+                        break;
+                }
+            }
+
+            List<String> faltantes = new ArrayList<>();
+
+            if (legalPerson == null) faltantes.add("LegalPerson");
+            if (terms == null) faltantes.add("Términos y Condiciones");
+            if (lrn == null) faltantes.add("Número de Registro Legal");
+
+            if (faltantes.isEmpty()) {
+                model.addAttribute("mensaje", "Credenciales completas, listo para continuar.");
+            } else {
+                model.addAttribute("error", "Faltan las siguientes credenciales: " + String.join(", ", faltantes));
+            }
+        }
         return "presentacionVerificable";
         
     }
@@ -171,15 +218,17 @@ class ControllerFirmador {
             
             if (file.isEmpty()) {
                 logger.info("El archivo no se ha subido correctamente."); 
-                model.addAttribute("error", "El archivo no se ha subido correctamente.");
-                return "peticionDatos";
+                model.addAttribute("errorMessage", "El archivo no se ha subido correctamente.");
                 
+                model.addAttribute("jsonGenerado", jsonGenerado);
+                model.addAttribute("typeJson", typeJson);
+                return "peticionDatos";
             }
 
             File f = faux.creaFichero(file);  
             ArrayList<String> aliasArray=Libreria.comprobarAlias(f);
              if (aliasArray.isEmpty()) {
-                model.addAttribute("error", "No se encontró ningún alias en el fichero.");
+                model.addAttribute("errorMessage", "No es un .p12");
                 return "peticionDatos";
             }
             String alias= aliasArray.get(0);
@@ -192,9 +241,13 @@ class ControllerFirmador {
               
             Key clavePrivada = Libreria.clave(alias, contrasena, f);
             if (clavePrivada == null) {
-                model.addAttribute("error", "No se pudo obtener la clave privada. Revisa el alias o la contraseña.");
+                model.addAttribute("errorMessage", "Clave incorrecta");
+                model.addAttribute("jsonGenerado", jsonGenerado);
+                model.addAttribute("typeJson", typeJson);
+
+
                 return "peticionDatos";
-        }
+            }
 
         
     
@@ -202,7 +255,7 @@ class ControllerFirmador {
                                
 
             //mario
-                String privateKey = """
+               /*  String privateKey = """
                 -----BEGIN PRIVATE KEY-----
                 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDRBL6jVcYoKb4g
                 Ip+qC27Hst/Mo7kCvYhDKkN5QNMtYL2rsydRwqfM8nEjeCJ7dhZR4Q7PfGEkQ8K5
@@ -233,24 +286,33 @@ class ControllerFirmador {
                 -----END PRIVATE KEY-----
                 """;
 
-                
-            /*String privateKey = "-----BEGIN PRIVATE KEY-----" +
+                */
+            String privateKey = "-----BEGIN PRIVATE KEY-----" +
                     Base64.getEncoder().encodeToString(clavePrivada.getEncoded()) +
-                    "-----END PRIVATE KEY-----";*/
+                    "-----END PRIVATE KEY-----";
 
             logger.info("Valor de la clave privada: " + privateKey);
 
             
 
             // Llamar a la API REST para firmar el JSON como JWT
-            String jsonData = faux.httpPetitionAPI_REST(privateKey, jsonGenerado);
-            logger.info("Respuesta del firmador (JWT): " + jsonData);
-            
+           String jsonData = null;
+            try {
+                jsonData = faux.httpPetitionAPI_REST(privateKey, jsonGenerado);
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+                e.printStackTrace();
+                model.addAttribute("errorMessage", "Error al firmar");
+                model.addAttribute("jsonGenerado", jsonGenerado);
+                model.addAttribute("typeJson", typeJson);
+            }
+                logger.info("Respuesta del firmador (JWT): " + jsonData);
+                        
 
-            model.addAttribute("jsonData", jsonData);
-            model.addAttribute("typeJson", typeJson);
+                        model.addAttribute("jsonData", jsonData);
+                        model.addAttribute("typeJson", typeJson);
 
-            return "muestraJws"; 
+                        return "muestraJws"; 
 
 
     
@@ -282,14 +344,16 @@ class ControllerFirmador {
         System.out.println("LRN Type: " + lrnType);
         System.out.println("LRN Value: " + lrnValue);
 
-        String jwtCredential = faux.httpPetitionLrn(verifiableId, subjectId, lrnValue, lrnType);
+            String jwtCredential = faux.httpPetitionLrn(verifiableId, subjectId, lrnValue, lrnType);
         logger.info("Valor de jwtCredential: " + jwtCredential);
 
-
-
-
-        model.addAttribute("jsonData", jwtCredential);
-        model.addAttribute("typeJson", "LRN");
+        
+        if (jwtCredential == null || jwtCredential.isEmpty() || jwtCredential.startsWith("Error") ) {
+            model.addAttribute("mensajeError", "Error al obtener la credencial, datos incorrectos" );
+        } else {
+            model.addAttribute("jsonData", jwtCredential);
+            model.addAttribute("typeJson", "LRN");
+        }
 
 
 

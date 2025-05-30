@@ -21,12 +21,11 @@
     </script>
 </head>
 <body>
-    <div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
 
     
         <div class="container">
             <form action="#" th:action="@{/upload}" method="POST" enctype="multipart/form-data" onsubmit="saveHiddenFieldsToLocalStorage()">
-                <h2>Upload Signing Certificate (.p12)</h2>
+                <h2>Seleccionar Certificado de Firma (.p12)</h2>
 
                 <div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
 
@@ -51,7 +50,12 @@
                 <input type="hidden" id="jsonGenerado" name="jsonGenerado" th:value="${jsonGenerado}" />
                
 
-                <button type="submit">Siguiente</button>
+                <div class="button-group">
+                <button type="submit">Enviar</button>
+                <button type="button" onclick="window.location.href='/'" class="cancel-btn">Cancelar operación</button>
+            </div>
+
+
             </form>
         </div>
     </div>

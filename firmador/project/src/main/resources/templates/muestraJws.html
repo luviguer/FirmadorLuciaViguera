@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Verifiable Credential Viewer</title>
-    <link rel="stylesheet" href="./style_muestraJws.css">
-    
+    <link rel="stylesheet" href="./style_muestraJws.css" />
     <script>
         function showContent(type) {
             const jsonData = document.getElementById('jsonData');
@@ -45,40 +44,59 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const jsonData = document.querySelector('#jsonData pre').textContent;
-            const decoded = decodeJWT(jsonData);
-            document.querySelector('#decodedJson pre').textContent = decoded;
-
-            showContent('decodedJson');  // Default to JSON view
+            // Solo intentamos decodificar si no hay mensajeError
+            const errorElem = document.getElementById('mensajeError');
+            if (!errorElem) {
+                const jsonData = document.querySelector('#jsonData pre').textContent;
+                const decoded = decodeJWT(jsonData);
+                document.querySelector('#decodedJson pre').textContent = decoded;
+                showContent('decodedJson');  // Default to JSON view
+            }
         });
     </script>
 </head>
 <body>
     <h1>Tu credencial verificable</h1>
 
-    <div class="tab-container">
-        <div class="tab active" data-tab="json" onclick="showContent('json')">JWT</div>
-        <div class="tab" data-tab="decodedJson" onclick="showContent('decodedJson')">JSON</div>
+    <!-- Mensaje de error -->
+   <div th:if="${mensajeError != null}" class="mensaje-sin-credenciales" id="mensajeError">
+    <p th:text="${mensajeError}"></p>
+
+    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <form th:action="@{/}" method="GET">
+            <button type="submit">Inicio</button>
+        </form>
+        <form th:action="@{/startLRN}" method="GET">
+            <button type="submit">Volver a intentar</button>
+        </form>
     </div>
+</div>
+    <!-- Contenido principal, solo si no hay error -->
+    <div th:if="${mensajeError == null}">
+        <div class="tab-container">
+            <div class="tab active" data-tab="json" onclick="showContent('json')">JWT</div>
+            <div class="tab" data-tab="decodedJson" onclick="showContent('decodedJson')">JSON</div>
+        </div>
 
-    <div id="jsonData" class="content-container active">
-        <button onclick="copyToClipboard('jsonData')">Copiar</button>
-        <pre th:text="${jsonData}"></pre>
+        <div id="jsonData" class="content-container active">
+            <button onclick="copyToClipboard('jsonData')">Copiar</button>
+            <pre th:text="${jsonData}"></pre>
+        </div>
+
+        <div id="decodedJson" class="content-container">
+            <button onclick="copyToClipboard('decodedJson')">Copiar</button>
+            <pre></pre>
+        </div>
+
+        <form th:action="@{/}" method="GET">
+            <button class="inicio" type="submit">Volver al inicio</button>
+        </form>
+
+        <form th:action="@{/guardarCredencial}" method="POST">
+            <button class="inicio" type="submit">Guardar credencial</button>
+            <input type="hidden" id="typeJson" name="typeJson" th:value="${typeJson}" />
+            <input type="hidden" id="jsonData" name="jsonData" th:value="${jsonData}" />
+        </form>
     </div>
-
-    <div id="decodedJson" class="content-container">
-        <button onclick="copyToClipboard('decodedJson')">Copiar</button>
-        <pre></pre>
-    </div>
-
-    <form th:action="@{/}" method="GET">
-        <button class="inicio" type="submit">Crear otra credencial</button>
-    </form>
-
-    <form th:action="@{/guardarCredencial}" method="POST">
-        <button class="inicio" type="submit">Guardar credencial</button>
-        <input type="hidden" id="typeJson" name="typeJson" th:value="${typeJson}" />
-        <input type="hidden" id="jsonData" name="jsonData" th:value="${jsonData}" />
-    </form>
 </body>
 </html>

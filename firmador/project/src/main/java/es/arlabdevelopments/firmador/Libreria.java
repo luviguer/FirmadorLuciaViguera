@@ -14,13 +14,7 @@ public class Libreria {
     
 
 
-    /**
-     * Metodo que recibe un fichero, obtiene el certificado y devuelve los alias
-     * contenidos en el mismo
-     *
-     * @param cert Fichero que contiene un certificado PKCS12
-     * @return Un array list
-     */
+  
     public static ArrayList<String> comprobarAlias(File cert) {
         KeyStore ks = obtenerKeyStore(cert);
 
@@ -40,17 +34,7 @@ public class Libreria {
         return lista;
     }
 
-    /**
-     * Metodo que devuelve la clave de un fichero dadas las credenciales
-     *
-     * @param alias      El alias del certificado
-     * @param contrasena La contraseña del certificado
-     * @param cert       El fichero que referencia al certificado
-     * @return Un objeto tipo Key en caso de que el fichero y las credenciales
-     * referenciasen a una clave privada, en caso de que la clave no fuese
-     * correcta o no referenciase a una clave privada devolvera <b>null</b>
-     * LUCIA: AÑADIR QUE HE COMPROBADO QUE LA CONTRASEÑA SEA INCORRECTA 
-     */
+   
     public static Key clave(String alias, String contrasena, File cert) {
         Key k = null;
         try (FileInputStream fis = new FileInputStream(cert)) {
@@ -75,12 +59,7 @@ public class Libreria {
 
     
 
-    /**
-     * Metodo para obtener una KeyStore recibiendo un fichero
-     *
-     * @param cert El fichero que contiene el certificado
-     * @return La KeyStore contenida en el certificado
-     */
+   
     private static KeyStore obtenerKeyStore(File cert) {
         KeyStore ks = null;
         try (FileInputStream fis = new FileInputStream(cert)) {
