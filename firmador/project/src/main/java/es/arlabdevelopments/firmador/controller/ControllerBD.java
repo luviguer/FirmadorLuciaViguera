@@ -85,7 +85,7 @@ class ControllerDB {
 
         if (!dni.matches("\\d{8}[A-HJ-NP-TV-Z]")) {
         model.addAttribute("error", "El formato del DNI no es válido. Debe tener 8 números seguidos de una letra.");
-        return "login";
+        return "auth";
     }
 
         // Validar que las contraseñas coincidan
